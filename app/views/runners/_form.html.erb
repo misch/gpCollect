@@ -23,6 +23,10 @@
     <%= f.label :birth_date %><br>
     <%= f.date_select :birth_date %>
   </div>
+  <div class="field">
+    <%= f.label :sex %><br>
+    <%= f.select :sex, options_for_select(%w[male female both none]) %>
+  </div>
   <div class="actions">
     <%= f.submit %>
   </div>

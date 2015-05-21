@@ -69,6 +69,6 @@ class RunnersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def runner_params
-      params.require(:runner).permit(:first_name, :last_name, :birth_date)
+      params.require(:runner).permit(:first_name, :last_name, :birth_date, :sex)
     end
 end
