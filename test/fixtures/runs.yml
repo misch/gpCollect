@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  start: 2015-05-25 17:13:43
+  duration: 2015-05-25 17:13:43
+  runner_id: 
+
+two:
+  start: 2015-05-25 17:13:43
+  duration: 2015-05-25 17:13:43
+  runner_id: 

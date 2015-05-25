@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :categories
+  resources :runs
   resources :runners
   get 'welcome/index'
 

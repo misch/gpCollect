@@ -1,5 +1,5 @@
 <p id="notice"><%= notice %></p>
-
+<h1>Runner</h1>
 <p>
   <strong>First name:</strong>
   <%= @runner.first_name %>
@@ -19,6 +19,20 @@
   <strong>Sex:</strong>
   <%= @runner.sex %>
 </p>
+
+
+<h1>Runs</h1>
+<% @runner.runs.each do |run| %>
+    <p>
+      <strong>Start:</strong>
+      <%= run.start %>
+    </p>
+
+    <p>
+      <strong>Duration:</strong>
+      <%= run.duration%>
+    </p>
+<% end %>
 
 <%= link_to 'Edit', edit_runner_path(@runner) %> |
 <%= link_to 'Back', runners_path %>
