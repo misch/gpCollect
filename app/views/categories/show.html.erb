@@ -6,8 +6,13 @@
 </p>
 
 <p>
-  <strong>Age:</strong>
-  <%= @category.age %>
+  <strong>Min age:</strong>
+  <%= @category.age_min %>
+</p>
+
+<p>
+  <strong>Max age:</strong>
+  <%= @category.age_max %>
 </p>
 
 <%= link_to 'Edit', edit_category_path(@category) %> |

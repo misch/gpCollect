@@ -11,10 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521154154) do
+ActiveRecord::Schema.define(version: 20150525160043) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "categories", force: :cascade do |t|
+    t.string   "sex"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "age_min"
+    t.integer  "age_max"
+  end
 
   create_table "runners", force: :cascade do |t|
     t.string   "first_name"
@@ -25,4 +33,18 @@ ActiveRecord::Schema.define(version: 20150521154154) do
     t.string   "sex"
   end
 
+  create_table "runs", force: :cascade do |t|
+    t.datetime "start"
+    t.time     "duration"
+    t.integer  "runner_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.integer  "category_id"
+  end
+
+  add_index "runs", ["category_id"], name: "index_runs_on_category_id", using: :btree
+  add_index "runs", ["runner_id"], name: "index_runs_on_runner_id", using: :btree
+
+  add_foreign_key "runs", "categories"
+  add_foreign_key "runs", "runners"
 end
