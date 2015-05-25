@@ -22,6 +22,35 @@
 
 
 <h1>Runs</h1>
+
+
+<script type="text/javascript" charset="utf-8">
+    $(function(){
+        new Highcharts.Chart({
+            chart: {
+                renderTo: "runs_chart"
+            },
+            title: {
+                text: "Runs"
+            },
+            xAxis: {
+                type: "datetime"
+            },
+            yAxis: {
+                title: {
+                    text: "Duration"
+                }
+            },
+            series: [{
+                pointInterval: <%= 1.day * 1000 %>,
+                pointStart: <%= 3.weeks.ago.to_i * 1000 %>,
+                data: [1,2,5,7,3,100,20]
+            }]
+        });
+    });
+</script>
+<div id="runs_chart" style="width:560px; height:300px;"></div>
+
 <% @runner.runs.each do |run| %>
     <p>
       <strong>Start:</strong>
