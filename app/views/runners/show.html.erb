@@ -23,45 +23,47 @@
 
 <h1>Runs</h1>
 
-
-<script type="text/javascript" charset="utf-8">
-    $(function(){
-        new Highcharts.Chart({
-            chart: {
-                renderTo: "runs_chart"
-            },
-            title: {
-                text: "Runs"
-            },
-            xAxis: {
-                type: "datetime"
-            },
-            yAxis: {
+<% if @runner.runs.empty? %>
+    No runs available
+<% else %>
+    <script type="text/javascript" charset="utf-8">
+        $(function(){
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: "runs_chart"
+                },
                 title: {
-                    text: "Duration"
-                }
-            },
-            series: [{
-                pointInterval: <%= 1.year * 1000 %>,
-                pointStart: <%= @runner.runs.sort_by{ |r| [r.start]}.first.start.to_i * 1000%>,
-                data: [1,2,5,7,3,100,20]
-            }]
+                    text: "Runs"
+                },
+                xAxis: {
+                    type: "datetime"
+                },
+                yAxis: {
+                    title: {
+                        text: "Duration"
+                    }
+                },
+                series: [{
+                    pointInterval: <%= 1.year * 1000 %>,
+                    pointStart: <%= @runner.earliest_run.start.to_i * 1000 %>,
+                    data: [1,2,5,7,3,100,20]
+                }]
+            });
         });
-    });
-</script>
-<div id="runs_chart" style="width:560px; height:300px;"></div>
+    </script>
+    <div id="runs_chart" style="width:560px; height:300px;"></div>
 
-<% @runner.runs.each do |run| %>
-    <p>
-      <strong>Start:</strong>
-      <%= run.start %>
-    </p>
+    <% @runner.runs.each do |run| %>
+        <p>
+          <strong>Start:</strong>
+          <%= run.start %>
+        </p>
 
-    <p>
-      <strong>Duration:</strong>
-      <%= run.duration%>
-    </p>
+        <p>
+          <strong>Duration:</strong>
+          <%= run.duration%>
+        </p>
+    <% end %>
 <% end %>
-
 <%= link_to 'Edit', edit_runner_path(@runner) %> |
 <%= link_to 'Back', runners_path %>
