@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150525160043) do
+ActiveRecord::Schema.define(version: 20150818122310) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,18 +28,19 @@ ActiveRecord::Schema.define(version: 20150525160043) do
     t.string   "first_name"
     t.string   "last_name"
     t.date     "birth_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.string   "sex"
+    t.string   "club_or_hometown"
+    t.string   "nationality"
   end
 
   create_table "runs", force: :cascade do |t|
-    t.datetime "start"
-    t.time     "duration"
     t.integer  "runner_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
     t.integer  "category_id"
+    t.integer  "duration",    limit: 8
   end
 
   add_index "runs", ["category_id"], name: "index_runs_on_category_id", using: :btree
