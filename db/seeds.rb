@@ -10,7 +10,7 @@ require 'csv'
 
 def duration_string_to_milliseconds(duration_string)
   duration_array = duration_string.split(':').map(&:to_f)
-  ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[0]) * 1000).to_i
+  ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[2]) * 1000).to_i
 end
 
 Run.delete_all

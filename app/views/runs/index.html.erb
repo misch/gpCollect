@@ -15,7 +15,7 @@
   <tbody>
     <% @runs.each do |run| %>
       <tr>
-        <td><%= run.duration %></td>
+        <td class="col-xs-1"><%= run.duration %></td>
         <td><%= run.runner_name %></td>
         <td><%= run.category.sex %> <%= run.category.age_min %> - <%= run.category.age_max%></td>
         <td><%= link_to 'Show', run %></td>

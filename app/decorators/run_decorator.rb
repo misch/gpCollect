@@ -5,7 +5,7 @@ class RunDecorator < Draper::Decorator
     hours = object.duration / 3600 / 1000
     minutes = (object.duration % (3600 * 1000)) / 60 / 1000
     seconds = (object.duration % (60 * 1000)).to_f / 1000
-    "#{hours}:#{minutes}:#{seconds}"
+    '%02d:%02d:%04.1f'  % [hours, minutes, seconds]
   end
 
   def runner_name
