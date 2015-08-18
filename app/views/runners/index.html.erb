@@ -1,7 +1,7 @@
 <p id="notice"><%= notice %></p>
 
 <h1>Listing Runners</h1>
-
+<%= paginate @runners, :theme => 'twitter-bootstrap-3' %>
 <table>
   <thead>
     <tr>
@@ -27,7 +27,7 @@
     <% end %>
   </tbody>
 </table>
-
+<%= paginate @runners, :theme => 'twitter-bootstrap-3' %>
 <br>
 
 <%= link_to 'New Runner', new_runner_path %>
