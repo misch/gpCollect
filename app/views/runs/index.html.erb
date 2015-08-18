@@ -2,7 +2,7 @@
 
 <h1>Listing Runs</h1>
 <%= paginate @runs, :theme => 'twitter-bootstrap-3' %>
-<table>
+<table class="table table-hover">
   <thead>
     <tr>
       <th>Duration</th>
@@ -16,8 +16,8 @@
     <% @runs.each do |run| %>
       <tr>
         <td><%= run.duration %></td>
-        <td> <%= run.runner.first_name %> <%= run.runner.last_name %></td>
-        <td> <%= run.category.sex %> <%= run.category.age_min%> - <%= run.category.age_max%></td>
+        <td><%= run.runner_name %></td>
+        <td><%= run.category.sex %> <%= run.category.age_min %> - <%= run.category.age_max%></td>
         <td><%= link_to 'Show', run %></td>
         <td><%= link_to 'Edit', edit_run_path(run) %></td>
         <td><%= link_to 'Destroy', run, method: :delete, data: { confirm: 'Are you sure?' } %></td>
