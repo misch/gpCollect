@@ -1,11 +1,10 @@
 <p id="notice"><%= notice %></p>
 
 <h1>Listing Runs</h1>
-
+<%= paginate @runs, :theme => 'twitter-bootstrap-3' %>
 <table>
   <thead>
     <tr>
-      <th>Start</th>
       <th>Duration</th>
       <th>Runner</th>
       <th>Category</th>
@@ -16,7 +15,6 @@
   <tbody>
     <% @runs.each do |run| %>
       <tr>
-        <td><%= run.start %></td>
         <td><%= run.duration %></td>
         <td> <%= run.runner.first_name %> <%= run.runner.last_name %></td>
         <td> <%= run.category.sex %> <%= run.category.age_min%> - <%= run.category.age_max%></td>
