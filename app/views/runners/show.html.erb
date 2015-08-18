@@ -45,7 +45,6 @@
                 },
                 series: [{
                     pointInterval: <%= 1.year * 1000 %>,
-                    pointStart: <%= @runner.earliest_run.start.to_i * 1000 %>,
                     data: [1,2,5,7,3,100,20]
                 }]
             });
@@ -53,15 +52,10 @@
     </script>
     <div id="runs_chart" style="width:560px; height:300px;"></div>
 
-    <% @runner.runs.each do |run| %>
-        <p>
-          <strong>Start:</strong>
-          <%= run.start %>
-        </p>
-
+    <% @runner.runs.decorate.each do |run| %>
         <p>
           <strong>Duration:</strong>
-          <%= run.duration%>
+          <%= run.duration %>
         </p>
     <% end %>
 <% end %>

@@ -1,18 +1,13 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Start:</strong>
-  <%= @run.start %>
-</p>
-
-<p>
   <strong>Duration:</strong>
   <%= @run.duration %>
 </p>
 
 <p>
   <strong>Runner:</strong>
-  <%= @run.runner.first_name %> <%= @run.runner.last_name %>
+  <%= @run.runner_name %>
 </p>
 
 <%= link_to 'Edit', edit_run_path(@run) %> |
