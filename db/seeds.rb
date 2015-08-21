@@ -25,6 +25,8 @@ route = Route.create!(length: 16.093)
 gp_bern_organizer = Organizer.create!(name: "Grand Prix von Bern")
 run_day = RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2015, 5, 9), weather: "dunno", route: route)
 
+file = 'db/data/gp_bern_10m_2015.csv'
+progressbar = ProgressBar.create(total: `wc -l #{file}`.to_i)
 ActiveRecord::Base.transaction do
   CSV.open('db/data/gp_bern_10m_2015.csv', headers: true, col_sep: ';').each do |line|
     category_hash = {}
@@ -66,5 +68,7 @@ ActiveRecord::Base.transaction do
     unless duration_string.blank?
       Run.create!(runner: runner, category: category, duration: duration_string_to_milliseconds(duration_string), run_day: run_day)
     end
+    progressbar.increment
   end
 end
+progressbar.finish
