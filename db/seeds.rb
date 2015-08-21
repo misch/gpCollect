@@ -13,12 +13,13 @@ def duration_string_to_milliseconds(duration_string)
   ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[2]) * 1000).to_i
 end
 
+RunDay.delete_all
 Run.delete_all
 Runner.delete_all
 Category.delete_all
 Route.delete_all
 Organizer.delete_all
-RunDay.delete_all
+
 
 route = Route.create!(length: 16.093)
 gp_bern_organizer = Organizer.create!(name: "Grand Prix von Bern")
