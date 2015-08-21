@@ -2,10 +2,38 @@ require 'rails_helper'
 load 'db/seed_helpers.rb'
 
 RSpec.describe 'seed_helpers' do
-  it 'should match all variants of names with the name regexp' do
+  it 'should match the most common variant with the name regexp' do
     matches = NAME_REGEXP.match 'Abati, Mauro (SUI)'
-    expect(matches[1]).to eq('Abati')
-    expect(matches[2]).to eq('Mauro')
-    expect(matches[3]).to eq('SUI')
+    expect(matches[:last_name]).to eq('Abati')
+    expect(matches[:first_name]).to eq('Mauro')
+    expect(matches[:nationality]).to eq('SUI')
+  end
+
+  it 'should match names with composed first names separated by dash with the name regexp' do
+    matches = NAME_REGEXP.match 'Abegglen, Marie-Thérèse (SUI)'
+    expect(matches[:last_name]).to eq('Abegglen')
+    expect(matches[:first_name]).to eq('Marie-Thérèse')
+    expect(matches[:nationality]).to eq('SUI')
+  end
+
+  it 'should match names with composed last names separated by dash with the name regexp' do
+    matches = NAME_REGEXP.match 'Aegerter-Rüegsegger, Verena (SUI)'
+    expect(matches[:last_name]).to eq('Aegerter-Rüegsegger')
+    expect(matches[:first_name]).to eq('Verena')
+    expect(matches[:nationality]).to eq('SUI')
+  end
+
+  it 'should match names with composed first names separated by space with the name regexp' do
+    matches = NAME_REGEXP.match 'Aeschlimann, Karin Andrea (SUI)'
+    expect(matches[:last_name]).to eq('Aeschlimann')
+    expect(matches[:first_name]).to eq('Karin Andrea')
+    expect(matches[:nationality]).to eq('SUI')
+  end
+
+  it 'should match names without nationality' do
+    matches = NAME_REGEXP.match 'von Allmen-Sarmiento, Teresita'
+    expect(matches[:last_name]).to eq('von Allmen-Sarmiento')
+    expect(matches[:first_name]).to eq('Teresita')
+    expect(matches[:nationality]).to be nil
   end
 end

@@ -11,7 +11,8 @@ def duration_string_to_milliseconds(duration_string)
   end
 end
 
-NAME_REGEXP = /([^,]*), ([^(]*) \(([A-Z]*)\)/
+NAME_REGEXP = /(?<last_name>[^,]*), (?<first_name>[^(]+?) ?(?:\((?<nationality>[A-Z]*)\))?$/
+
 def seed_runs_file(options)
   file = options.fetch(:file)
   puts "Seeding #{file} "
@@ -28,9 +29,9 @@ def seed_runs_file(options)
       begin
         # E. g. 'Abati, Mauro (SUI)'
         m = name.match NAME_REGEXP do |matches|
-          runner_hash[:last_name] = matches[1]
-          runner_hash[:first_name] = matches[2]
-          runner_hash[:nationality] = matches[3]
+          runner_hash[:last_name] = matches[:last_name]
+          runner_hash[:first_name] = matches[:first_name]
+          runner_hash[:nationality] = matches[:nationality]
         end
         unless m
           # Known issue: in 2013 file there are some names that only consist of nationality, skip these
