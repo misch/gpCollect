@@ -1,5 +1,5 @@
 require 'rails_helper'
-load 'db/seed_helpers.rb'
+require_relative '../../db/seed_helpers'
 
 RSpec.describe 'seed_helpers' do
   it 'should match the most common variant with the name regexp' do
@@ -32,8 +32,14 @@ RSpec.describe 'seed_helpers' do
 
   it 'should match names without nationality' do
     matches = NAME_REGEXP.match 'von Allmen-Sarmiento, Teresita'
+    expect(matches).to be_truthy
     expect(matches[:last_name]).to eq('von Allmen-Sarmiento')
     expect(matches[:first_name]).to eq('Teresita')
     expect(matches[:nationality]).to be nil
+  end
+
+  it 'should not match if only nationality is present' do
+    matches = NAME_REGEXP.match '(SUI)'
+    expect(matches).to be_falsey
   end
 end
