@@ -9,6 +9,7 @@
       <th>Last name</th>
       <th>Birth date</th>
       <th>Sex</th>
+      <th>Participations</th>
       <th></th>
     </tr>
   </thead>
@@ -20,6 +21,7 @@
         <td><%= runner.last_name %></td>
         <td><%= runner.birth_date %></td>
         <td><%= runner.sex %></td>
+        <td><%= runner.runs.size %></td>
         <td><%= link_to 'Show', runner %></td>
       </tr>
     <% end %>
