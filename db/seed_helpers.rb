@@ -28,7 +28,7 @@ def seed_runs_file(options)
       runner_hash[:club_or_hometown] = line[6]
       begin
         # E. g. 'Abati, Mauro (SUI)'
-        m = name.match NAME_REGEXP do |matches|
+        m = NAME_REGEXP.match name do |matches|
           runner_hash[:last_name] = matches[:last_name]
           runner_hash[:first_name] = matches[:first_name]
           runner_hash[:nationality] = matches[:nationality]

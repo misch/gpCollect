@@ -1,4 +1,4 @@
-require 'seed_helpers'
+require_relative 'seed_helpers'
 
 Run.delete_all
 RunDay.delete_all
