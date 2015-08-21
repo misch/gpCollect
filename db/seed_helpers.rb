@@ -28,12 +28,12 @@ def seed_runs_file(options)
       runner_hash[:club_or_hometown] = line[6]
       begin
         # E. g. 'Abati, Mauro (SUI)'
-        m = NAME_REGEXP.match name do |matches|
-          runner_hash[:last_name] = matches[:last_name]
-          runner_hash[:first_name] = matches[:first_name]
-          runner_hash[:nationality] = matches[:nationality]
-        end
-        unless m
+        m = NAME_REGEXP.match name
+        if m
+          runner_hash[:last_name] = m[:last_name]
+          runner_hash[:first_name] = m[:first_name]
+          runner_hash[:nationality] = m[:nationality]
+        else
           # Known issue: in 2013 file there are some names that only consist of nationality, skip these
           if name.match /\([A-Z]{3}\)/
             next
