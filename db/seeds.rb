@@ -14,8 +14,11 @@ def duration_string_to_milliseconds(duration_string)
 end
 
 def seed_runs_file(options)
-  puts "Seed " + options.fetch(:file)
-  progressbar = ProgressBar.create(total: `wc -l #{file}`.to_i)
+  file = options.fetch(:file)
+  puts "Seeding #{file} "
+  progressbar = ProgressBar.create(total: `wc -l #{file}`.to_i, format: '%B %R runs/s, %a',
+                                   :throttle_rate => 0.1)
+  run_day = options.fetch(:run_day)
   ActiveRecord::Base.transaction do
     CSV.open(file, headers: true, col_sep: ';').each do |line|
       category_hash = {}
@@ -55,7 +58,8 @@ def seed_runs_file(options)
       duration_string = line[10]
       # TODO: think of something to handle intermediary times.
       unless duration_string.blank?
-        Run.create!(runner: runner, category: category, duration: duration_string_to_milliseconds(duration_string), run_day: options.fetch(:run_day))
+        Run.create!(runner: runner, category: category, duration: duration_string_to_milliseconds(duration_string),
+                    run_day: run_day)
       end
       progressbar.increment
     end
@@ -71,6 +75,7 @@ Category.delete_all
 Route.delete_all
 Organizer.delete_all
 
+
 route_16km = Route.create!(length: 16.093)
 gp_bern_organizer = Organizer.create!(name: "Grand Prix von Bern")
 run_day_gp_2015_16km = RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2015, 5, 9), weather: "dunno", route: route_16km)
@@ -79,3 +84,4 @@ files = [{file: "db/data/gp_bern_10m_2015.csv", run_day: run_day_gp_2015_16km}]
 files.each { |file| seed_runs_file file }
 
 puts "All files seeded."
+
