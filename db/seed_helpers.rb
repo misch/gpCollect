@@ -107,4 +107,8 @@ def merge_duplicates
   # Achim	Seifermann	Laufwelt.de
   #only_differing_club_or_hometown = Runner.select(identifying_runner_attributes - [:club_or_hometown])
   #                                      .group(identifying_runner_attributes - [:club_or_hometown]).having('count(*) > 1')
+
+  # TODO: try to fix case sensitive duplicates in club_or_hometown
+  # Veronique	Plessis	Arc Et Senans
+  # Veronique	Plessis	Arc et Senans
 end
