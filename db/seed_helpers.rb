@@ -85,7 +85,7 @@ MALE_FIRST_NAMES = %w(Jannick)
 FEMALE_FIRST_NAMES = %w()
 POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
 POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
-
+POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
 
 def merge_duplicates
   identifying_runner_attributes = [:first_name, :last_name, :nationality, :club_or_hometown, :sex]
@@ -154,6 +154,26 @@ def merge_duplicates
       merge_runners(correct_entry, wrong_entry)
     end
     puts "Merged #{only_differing_case.size} entries based on case of #{attr}."
+  end
+
+  POSSIBLY_WRONGLY_SPACED_ATTRIBUTES.each do |attr|
+    only_differing_space = Runner.select(identifying_runner_attributes - [attr] + ["replace(#{attr}, '-', ' ') as spaced"])
+                               .group(identifying_runner_attributes - [attr] + ['spaced'])
+                               .having('count(*) > 1')
+    only_differing_space.each do |r|
+      entries = Runner.where(r.serializable_hash.except('id', 'spaced')).where("replace(#{attr}, '-', ' ') = ?", r['spaced'] )
+      if entries.size != 2
+        raise 'More than two possibilities, dont know what to do!'
+      end
+      # We take the one with more spaces as he correct one.
+      correct_entry, wrong_entry = if entries.first[attr].scan(/ /).size > entries.second[attr].scan(/ /).size
+                                     [entries.first, entries.second]
+                                   else
+                                     [entries.second, entries.first]
+                                   end
+      merge_runners(correct_entry, wrong_entry)
+    end
+    puts "Merged #{only_differing_space.size} entries based on spaces of #{attr}."
   end
 
   # TODO: Try to fix club_or_hometown duplicates, e. g.
