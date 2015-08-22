@@ -61,11 +61,7 @@ ActiveRecord::Schema.define(version: 20150822142453) do
     t.string   "nationality"
   end
 
-  add_index "runners", ["club_or_hometown"], name: "runners_club_or_hometown_gin", using: :gin
-  add_index "runners", ["first_name"], name: "runners_first_name_gin", using: :gin
   add_index "runners", ["last_name"], name: "index_runners_on_last_name", using: :btree
-  add_index "runners", ["last_name"], name: "runners_last_name_gin", using: :gin
-  add_index "runners", ["last_name"], name: "runners_last_name_pattern", using: :btree
 
   create_table "runs", force: :cascade do |t|
     t.integer  "runner_id"
