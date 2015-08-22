@@ -1,13 +1,12 @@
 <p id="notice"><%= notice %></p>
 
 <h1>Listing Runners</h1>
-<%= paginate @runners %>
-<table class="table table-hover">
+<table class="table table-hover" id="runners-datatable" data-source="<%= runners_path(format: :json) %>">
   <thead>
     <tr>
       <th>First name</th>
       <th>Last name</th>
-      <th>Birth date</th>
+      <th>Club or hometown</th>
       <th>Sex</th>
       <th>Participations</th>
       <th></th>
@@ -15,19 +14,8 @@
   </thead>
 
   <tbody>
-    <% @runners.each do |runner| %>
-      <tr>
-        <td><%= runner.first_name %></td>
-        <td><%= runner.last_name %></td>
-        <td><%= runner.birth_date %></td>
-        <td><%= runner.sex %></td>
-        <td><%= runner.runs.size %></td>
-        <td><%= link_to 'Show', runner %></td>
-      </tr>
-    <% end %>
   </tbody>
 </table>
-<%= paginate @runners %>
 <br>
 
 <%= link_to 'New Runner', new_runner_path %>
