@@ -11,11 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150822114648) do
+ActiveRecord::Schema.define(version: 20150822142453) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "unaccent"
+  enable_extension "pg_trgm"
 
   create_table "categories", force: :cascade do |t|
     t.string   "sex"
@@ -60,7 +61,11 @@ ActiveRecord::Schema.define(version: 20150822114648) do
     t.string   "nationality"
   end
 
+  add_index "runners", ["club_or_hometown"], name: "runners_club_or_hometown_gin", using: :gin
+  add_index "runners", ["first_name"], name: "runners_first_name_gin", using: :gin
   add_index "runners", ["last_name"], name: "index_runners_on_last_name", using: :btree
+  add_index "runners", ["last_name"], name: "runners_last_name_gin", using: :gin
+  add_index "runners", ["last_name"], name: "runners_last_name_pattern", using: :btree
 
   create_table "runs", force: :cascade do |t|
     t.integer  "runner_id"
