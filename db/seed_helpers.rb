@@ -134,11 +134,11 @@ def merge_duplicates
   # Veronique	Plessis	Arc Et Senans
   # Veronique	Plessis	Arc et Senans
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES.each do |attr|
-    only_differing_case = Runner.select(identifying_runner_attributes - [attr] + ["lower(#{attr}) as low"])
+    only_differing_case = Runner.select(identifying_runner_attributes - [attr] + ["f_unaccent(lower(#{attr})) as low"])
                               .group(identifying_runner_attributes - [attr] + ['low'])
                               .having('count(*) > 1')
     only_differing_case.each do |r|
-      entries = Runner.where(r.serializable_hash.except('id', 'low')).where("lower(#{attr}) = ?", r['low'] )
+      entries = Runner.where(r.serializable_hash.except('id', 'low')).where("f_unaccent(lower(#{attr})) = ?", r['low'] )
       if entries.size != 2
         raise 'More than two possibilities, dont know what to do!'
       end
