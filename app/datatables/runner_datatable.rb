@@ -17,12 +17,12 @@ class RunnerDatatable < AjaxDatatablesRails::Base
   def data
     records.map do |record|
       [
-        record.first_name,
-        record.last_name,
-        record.club_or_hometown,
-        record.sex,
-        record.runs.size,
-        link_to('Show', runner_path(record))
+          record.first_name,
+          record.last_name,
+          record.club_or_hometown,
+          record.sex,
+          record.runs.size,
+          link_to('Show', runner_path(record))
       ]
     end
   end
@@ -33,13 +33,21 @@ class RunnerDatatable < AjaxDatatablesRails::Base
 
   # Overrides the filter method defined from the gem. When searching, we ignore all accents, so a search for 'théo'
   # will also return 'theo' (and vice-versa).
+  # Every word (separated by space) will be searched individually in all searchable columns. Only rows that satisfy all
+  # words (in some column) are returned.
   def filter_records(records)
     if params[:search].present? and not params[:search][:value].blank?
-      term = "#{sanitize_sql_like(params[:search][:value])}%"
-      where_clause = searchable_columns.map do |model_and_column|
-        _, column = model_and_column.split('.')
-        "unaccent(#{column}) ILIKE f_unaccent('#{term}')"
-      end.join(' or ')
+      search_for = params[:search][:value].split(' ')
+      where_clause = search_for.map do |unescaped_term|
+        term = "#{sanitize_sql_like(unescaped_term)}%"
+        searchable_columns.map do |model_and_column|
+          model, column = model_and_column.split('.')
+          model = model.constantize
+          unaccented_column = ::Arel::Nodes::NamedFunction.new('f_unaccent', [model.arel_table[column.to_sym]])
+          unaccented_column.matches(::Arel::Nodes::NamedFunction.new('f_unaccent', [::Arel::Nodes::build_quoted(term)]))
+        end.reduce(:or)
+      end.reduce(:and)
+
       records.where(where_clause)
     else
       records
