@@ -39,7 +39,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
     if params[:search].present? and not params[:search][:value].blank?
       search_for = params[:search][:value].split(' ')
       where_clause = search_for.map do |unescaped_term|
-        term = "#{sanitize_sql_like(unescaped_term)}%"
+        term = "%#{sanitize_sql_like(unescaped_term)}%"
         searchable_columns.map do |model_and_column|
           model, column = model_and_column.split('.')
           model = model.constantize
