@@ -1,4 +1,5 @@
 require 'csv'
+include ActiveSupport::Inflector
 
 # TODO: Possibly handle disqualified cases better.
 # Right now they have nil as duration (but still have an entry in the run table).
@@ -74,13 +75,22 @@ def seed_runs_file(options)
   progressbar.finish
 end
 
+def merge_runners(runner, to_be_merged_runner)
+  runner.runs += to_be_merged_runner.runs
+  runner.save!
+  to_be_merged_runner.destroy!
+end
+
 MALE_FIRST_NAMES = %w(Jannick)
 FEMALE_FIRST_NAMES = %w()
+POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
+POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
+
 
 def merge_duplicates
   identifying_runner_attributes = [:first_name, :last_name, :nationality, :club_or_hometown, :sex]
 
-  # Handle wrong sex (if more are found)
+  # Handle wrong sex, try to find correct correct sex using name list.
   only_differing_sex = Runner.select(identifying_runner_attributes - [:sex])
                            .group(identifying_runner_attributes - [:sex]).having('count(*) > 1')
   only_differing_sex.each do |r|
@@ -93,22 +103,62 @@ def merge_duplicates
                   end
     correct_entry = Runner.where(sex: correct_sex).find_by!(r.serializable_hash.except('id'))
     incorrect_entry = Runner.where.not(sex: correct_sex).find_by!(r.serializable_hash.except('id'))
-    correct_entry.runs += incorrect_entry.runs
-    correct_entry.save!
-    incorrect_entry.destroy!
+    merge_runners(correct_entry, incorrect_entry)
   end
 
-  # TODO: try to fix wrongly written names, e. g.
-  # Abdel	Mâarouf	Bern	M
-  # Abdel	Maarouf	Bern	M
-  only_differing_first_name_accents = Runner.select(identifying_runner_attributes - [:first_name] + ["unaccent(first_name) as unaccent_first_name"]).group(identifying_runner_attributes - [:first_name] + ['unaccent_first_name']).having('count(*) > 1')
-  # TODO: try to fix club_or_hometown duplicates, e. g.
+  POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES.each do |attr|
+    only_differing_accents = Runner.select(identifying_runner_attributes - [attr] + ["f_unaccent(#{attr}) as unaccented"])
+                                 .group(identifying_runner_attributes - [attr] + ['unaccented'])
+                                 .having('count(*) > 1')
+    only_differing_accents.each do |r|
+      entries = Runner.where(r.serializable_hash.except('id', 'unaccented')).where("unaccent(#{attr}) = ?", r['unaccented'] )
+      if entries.size != 2
+        raise 'More than two possibilities, dont know what to do!'
+      end
+      # The correct entry is the one with accents (most probably?),
+      # so the one that is not equal to it's transliterated version.
+      correct_entry, wrong_entry = if entries.first[attr] == transliterate(entries.first[attr])
+                                     [entries.second, entries.first]
+                                   elsif entries.second[attr] == transliterate(entries.second[attr])
+                                     [entries.first, entries.second]
+                                   else
+                                     raise 'Couldnt find correct entry'
+                                   end
+      merge_runners(correct_entry, wrong_entry)
+    end
+    puts "Merged #{only_differing_accents.size} entries based on accents of #{attr}."
+  end
+
+
+  # Try to fix case sensitive duplicates in club_or_hometown, e. g. in
+  # Veronique	Plessis	Arc Et Senans
+  # Veronique	Plessis	Arc et Senans
+  POSSIBLY_WRONGLY_CASED_ATTRIBUTES.each do |attr|
+    only_differing_case = Runner.select(identifying_runner_attributes - [attr] + ["lower(#{attr}) as low"])
+                              .group(identifying_runner_attributes - [attr] + ['low'])
+                              .having('count(*) > 1')
+    only_differing_case.each do |r|
+      entries = Runner.where(r.serializable_hash.except('id', 'low')).where("lower(#{attr}) = ?", r['low'] )
+      if entries.size != 2
+        raise 'More than two possibilities, dont know what to do!'
+      end
+      # We take the one with more lowercase characters as he correct one. E. g. for
+      # Reichenbach I. K.
+      # Reichenbach i. K.
+      # the version at the bottom is preferred.
+      correct_entry, wrong_entry = if entries.first[attr].scan(/[[:lower:]]/).size > entries.second[attr].scan(/[[:lower:]]/).size
+                                     [entries.first, entries.second]
+                                   else
+                                     [entries.second, entries.first]
+                                   end
+      merge_runners(correct_entry, wrong_entry)
+    end
+    puts "Merged #{only_differing_case.size} entries based on case of #{attr}."
+  end
+
+  # TODO: Try to fix club_or_hometown duplicates, e. g.
   # Achim	Seifermann	LAUFWELT de Lauftreff
   # Achim	Seifermann	Laufwelt.de
   #only_differing_club_or_hometown = Runner.select(identifying_runner_attributes - [:club_or_hometown])
   #                                      .group(identifying_runner_attributes - [:club_or_hometown]).having('count(*) > 1')
-
-  # TODO: try to fix case sensitive duplicates in club_or_hometown
-  # Veronique	Plessis	Arc Et Senans
-  # Veronique	Plessis	Arc et Senans
 end
