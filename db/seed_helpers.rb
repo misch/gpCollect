@@ -73,3 +73,34 @@ def seed_runs_file(options)
   end
   progressbar.finish
 end
+
+MALE_FIRST_NAMES = %w(Jannick)
+FEMALE_FIRST_NAMES = %w()
+
+def merge_duplicates
+  identifying_runner_attributes = [:first_name, :last_name, :nationality, :club_or_hometown, :sex]
+
+  # Handle wrong sex (if more are found)
+  only_differing_sex = Runner.select(identifying_runner_attributes - [:sex])
+                           .group(identifying_runner_attributes - [:sex]).having('count(*) > 1')
+  only_differing_sex.each do |r|
+    correct_sex = if MALE_FIRST_NAMES.include?(r.first_name)
+                    'M'
+                  elsif FEMALE_FIRST_NAMES.include?(r.first_name)
+                    'W'
+                  else
+                    raise "Could not match gender to #{r}, please extend names list."
+                  end
+    correct_entry = Runner.where(sex: correct_sex).find_by!(r.serializable_hash.except('id'))
+    incorrect_entry = Runner.where.not(sex: correct_sex).find_by!(r.serializable_hash.except('id'))
+    correct_entry.runs += incorrect_entry.runs
+    correct_entry.save!
+    incorrect_entry.destroy!
+  end
+
+  # TODO: try to fix club_or_hometown duplicates, e. g.
+  # Achim	Seifermann	LAUFWELT de Lauftreff
+  # Achim	Seifermann	Laufwelt.de
+  #only_differing_club_or_hometown = Runner.select(identifying_runner_attributes - [:club_or_hometown])
+  #                                      .group(identifying_runner_attributes - [:club_or_hometown]).having('count(*) > 1')
+end

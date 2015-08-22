@@ -19,3 +19,4 @@ files = [{file: "db/data/gp_bern_10m_2013.csv",
           run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2015, 5, 9), route: route_16km)}]
 files.each { |file| seed_runs_file file }
 
+merge_duplicates
