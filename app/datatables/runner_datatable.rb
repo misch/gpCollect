@@ -3,7 +3,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
 
   def sortable_columns
     # Declare strings in this format: ModelName.column_name
-    @sortable_columns ||= ['Runner.first_name', 'Runner.last_name', 'Runner.club_or_hometown']
+    @sortable_columns ||= ['Runner.first_name', 'Runner.last_name', 'Runner.club_or_hometown', 'Runner.sex']
   end
 
   def searchable_columns
