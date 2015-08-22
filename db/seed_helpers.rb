@@ -98,6 +98,10 @@ def merge_duplicates
     incorrect_entry.destroy!
   end
 
+  # TODO: try to fix wrongly written names, e. g.
+  # Abdel	Mâarouf	Bern	M
+  # Abdel	Maarouf	Bern	M
+  only_differing_first_name_accents = Runner.select(identifying_runner_attributes - [:first_name] + ["unaccent(first_name) as unaccent_first_name"]).group(identifying_runner_attributes - [:first_name] + ['unaccent_first_name']).having('count(*) > 1')
   # TODO: try to fix club_or_hometown duplicates, e. g.
   # Achim	Seifermann	LAUFWELT de Lauftreff
   # Achim	Seifermann	Laufwelt.de
