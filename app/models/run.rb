@@ -1,5 +1,5 @@
 class Run < ActiveRecord::Base
-  belongs_to :runner
+  belongs_to :runner, counter_cache: true
   belongs_to :category
   belongs_to :run_day
 end
