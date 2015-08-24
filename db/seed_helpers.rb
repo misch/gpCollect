@@ -11,23 +11,45 @@ module SeedHelpers
     end
   end
 
+  CATEGORIES = {}
+  # Finds category with some memoization.
+  def self.find_or_create_category_for(category_string)
+    if CATEGORIES[category_string]
+      CATEGORIES[category_string]
+    else
+      category_hash = {}
+      category_string.match /([MW])U?(\d{1,3})/ do |matches|
+        category_hash[:sex] = matches[1]
+        if category_string[1] == 'U'
+          category_hash[:age_max] = matches[2].to_i
+        else
+          category_hash[:age_min] = matches[2].to_i
+        end
+      end
+      category = Category.find_or_create_by!(category_hash)
+      CATEGORIES[category_string] = category
+      category
+    end
+  end
+
   def self.find_or_create_runner_for(runner_hash, run_day, category)
     # only possible matches are runners that match all attribute and don't have a run already registered on that day.
-    possible_matches = Runner.includes(:run_days).where(runner_hash).where.not(run_days: {id: run_day.id})
+    possible_matches = Runner.includes(:run_days).where(runner_hash).where('run_days.id != ?', run_day.id).references(:run_days)
     estimated_birth_date = run_day.date - (category.age_max || category.age_min).years
     # Check which runner is closest in birth date
     closest_birth_date_diff, closest_birth_date_idx =
         possible_matches.map { |r| (r.birth_date - estimated_birth_date).abs }.each_with_index.min
+    # TODO: Don't only use age for finding closest match, but also duration of run vs average duration of runs.
     runner = if closest_birth_date_diff and closest_birth_date_diff < 10 * 365
                possible_matches[closest_birth_date_idx]
              else
                Runner.new(runner_hash.merge(birth_date: estimated_birth_date))
              end
     if category.age_max and runner.birth_date < estimated_birth_date
-      # Estimated age is a lower bound here, update to it is higher than previous estimate.
+      # Estimated age is a lower bound here, update to it if higher than previous estimate.
       runner.birth_date = estimated_birth_date
     elsif category.age_min and runner.birth_date > estimated_birth_date
-      # Estimated age is an upper bound here, update to it is lower than previous estimate.
+      # Estimated age is an upper bound here, update to it if lower than previous estimate.
       runner.birth_date = estimated_birth_date
     end
     runner.save!
@@ -44,7 +66,6 @@ module SeedHelpers
     run_day = options.fetch(:run_day)
     ActiveRecord::Base.transaction do
       CSV.open(file, headers: true, col_sep: ';').each do |line|
-        category_hash = {}
         runner_hash = {}
         name = line[4]
         category_string = line[5]
@@ -65,22 +86,11 @@ module SeedHelpers
             end
           end
 
-          unless category_string.blank?
-            category_string.match /([MW])U?(\d{1,3})/ do |matches|
-              category_hash[:sex] = matches[1]
-              if category_string[1] == 'U'
-                category_hash[:age_max] = matches[2].to_i
-              else
-                category_hash[:age_min] = matches[2].to_i
-              end
-            end
-          end
           duration_string = line[10]
           # Don't create a runner/run if there is no category or duration associated.
-          next if category_hash.blank? or duration_string.blank?
-          
-          category = Category.find_or_create_by!(category_hash)
-          runner_hash[:sex] = category_hash[:sex]
+          next if category_string.blank? or duration_string.blank?
+          category = find_or_create_category_for(category_string)
+          runner_hash[:sex] = category.sex
 
           runner = find_or_create_runner_for(runner_hash, run_day, category)
 
