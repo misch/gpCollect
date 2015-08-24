@@ -20,6 +20,10 @@
   <%= @runner.sex %>
 </p>
 
+<p>
+  <strong>Club or Hometown:</strong>
+  <%= @runner.club_or_hometown %>
+</p>
 
 <h1>Runs</h1>
 
@@ -52,12 +56,20 @@
     </script>
     <div id="runs_chart" style="width:560px; height:300px;"></div>
 
-    <% @runner.runs.decorate.each do |run| %>
-        <p>
-          <strong>Duration:</strong>
-          <%= run.duration %>
-        </p>
-    <% end %>
+    <table class="table table-striped">
+      <thead>
+      <th>Day</th>
+      <th>Category</th>
+      <th>Duration</th>
+      </thead>
+      <% @runner.runs.decorate.each do |run| %>
+          <tr>
+            <td><%= I18n.l run.run_day.date %></td>
+            <td><%= run.category.name %></td>
+            <td><%= run.duration %></td>
+          </tr>
+      <% end %>
+    </table>
 <% end %>
 <%= link_to 'Edit', edit_runner_path(@runner) %> |
 <%= link_to 'Back', runners_path %>
