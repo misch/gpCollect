@@ -1,11 +1,11 @@
 module MergeRunnersHelpers
-  def merge_runners(runner, to_be_merged_runner)
+  def self.merge_runners(runner, to_be_merged_runner)
     runner.runs += to_be_merged_runner.runs
     runner.save!
     to_be_merged_runner.destroy!
   end
 
-  def find_runners_only_differing_in(attr, additional_attributes_select=[], additional_attributes_group=[])
+  def self.find_runners_only_differing_in(attr, additional_attributes_select=[], additional_attributes_group=[])
     identifying_runner_attributes_select = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, '(current_date - birth_date)/365/10 AS age']
     identifying_runner_attributes_group = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, 'age']
     r = Runner.select(identifying_runner_attributes_select - [attr] + additional_attributes_select + ['array_agg(id) AS ids'])
@@ -19,7 +19,7 @@ module MergeRunnersHelpers
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
 
-  def merge_duplicates
+  def self.merge_duplicates
     # Handle wrong sex, try to find correct correct sex using name list.
     find_runners_only_differing_in(:sex).each do |entries|
       if entries.size != 2

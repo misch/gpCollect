@@ -2,7 +2,7 @@ require 'csv'
 module SeedHelpers
   # TODO: Possibly handle disqualified cases better.
   # Right now they have nil as duration (but still have an entry in the run table).
-  def duration_string_to_milliseconds(duration_string)
+  def self.duration_string_to_milliseconds(duration_string)
     if duration_string == 'DSQ'
       nil
     else
@@ -11,8 +11,9 @@ module SeedHelpers
     end
   end
 
-  def find_or_create_runner_for(runner_hash, category)
-    possible_matches = Runner.where(runner_hash)
+  def self.find_or_create_runner_for(runner_hash, run_day, category)
+    # only possible matches are runners that match all attribute and don't have a run already registered on that day.
+    possible_matches = Runner.includes(:run_days).where(runner_hash).where.not(run_days: {id: run_day.id})
     estimated_birth_date = run_day.date - (category.age_max || category.age_min).years
     # Check which runner is closest in birth date
     closest_birth_date_diff, closest_birth_date_idx =
@@ -30,11 +31,12 @@ module SeedHelpers
       runner.birth_date = estimated_birth_date
     end
     runner.save!
+    runner
   end
 
   NAME_REGEXP = /(?<last_name>[^,]*), (?<first_name>[^(]+?) ?(?:\((?<nationality>[A-Z]*)\))?$/
 
-  def seed_runs_file(options)
+  def self.seed_runs_file(options)
     file = options.fetch(:file)
     puts "Seeding #{file} "
     progressbar = ProgressBar.create(total: `wc -l #{file}`.to_i, format: '%B %R runs/s, %a',
@@ -73,21 +75,20 @@ module SeedHelpers
               end
             end
           end
-          # Don't create a runner/run if there is no category associated.
-          next if category_hash.blank?
+          duration_string = line[10]
+          # Don't create a runner/run if there is no category or duration associated.
+          next if category_hash.blank? or duration_string.blank?
+          
           category = Category.find_or_create_by!(category_hash)
           runner_hash[:sex] = category_hash[:sex]
 
-          runner = find_or_create_runner_for(runner_hash, category)
+          runner = find_or_create_runner_for(runner_hash, run_day, category)
 
           # TODO: Somehow handle this over multiple years (allow change of hometown)
           #runner.update_attributes!(club_or_hometown: club_or_hometown)
-          duration_string = line[10]
           # TODO: think of something to handle intermediary times.
-          unless duration_string.blank?
-            Run.create!(runner: runner, category: category, duration: duration_string_to_milliseconds(duration_string),
-                        run_day: run_day)
-          end
+          Run.create!(runner: runner, category: category, duration: duration_string_to_milliseconds(duration_string),
+                      run_day: run_day)
           progressbar.increment
         rescue Exception => e
           puts "Failed parsing: #{line}"
