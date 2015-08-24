@@ -1,5 +1,4 @@
 require 'csv'
-include ActiveSupport::Inflector
 
 # TODO: Possibly handle disqualified cases better.
 # Right now they have nil as duration (but still have an entry in the run table).
@@ -9,6 +8,18 @@ def duration_string_to_milliseconds(duration_string)
   else
     duration_array = duration_string.split(':').map(&:to_f)
     ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[2]) * 1000).to_i
+  end
+end
+
+def find_or_create_runner_for(runner_hash, estimated_birth_date)
+  possible_matches = Runner.where(runner_hash)
+  # Check which runner is closest in birth date
+  closest_birth_date_diff, closest_birth_date_idx =
+      possible_matches.map {|r| (r.birth_date - estimated_birth_date).abs }.each_with_index.min
+  if closest_birth_date_diff and closest_birth_date_diff < 10 * 365
+    possible_matches[closest_birth_date_idx]
+  else
+    Runner.create!(runner_hash.merge(birth_date: estimated_birth_date))
   end
 end
 
@@ -53,10 +64,14 @@ def seed_runs_file(options)
             end
           end
         end
-
-        category = category_hash.blank? ? nil : Category.find_or_create_by!(category_hash)
+        # Don't create a runner/run if there is no category associated.
+        next if category_hash.blank?
+        category = Category.find_or_create_by!(category_hash)
         runner_hash[:sex] = category_hash[:sex]
-        runner = Runner.find_or_create_by!(runner_hash)
+        estimated_birth_date = run_day.date - (category.age_max || category.age_min).years
+        runner = find_or_create_runner_for(runner_hash, estimated_birth_date)
+
+
         # TODO: Somehow handle this over multiple years (allow change of hometown)
         #runner.update_attributes!(club_or_hometown: club_or_hometown)
         duration_string = line[10]
@@ -81,6 +96,14 @@ def merge_runners(runner, to_be_merged_runner)
   to_be_merged_runner.destroy!
 end
 
+def find_runners_only_differing_in(attr, additional_attributes_select=[], additional_attributes_group=[])
+  identifying_runner_attributes_select = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, '(current_date - birth_date)/365/10 AS age']
+  identifying_runner_attributes_group = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, 'age']
+  r = Runner.select(identifying_runner_attributes_select - [attr] + additional_attributes_select + ['array_agg(id) AS ids'])
+          .group(identifying_runner_attributes_group - [attr] + additional_attributes_group).having('count(*) > 1')
+  r.map {|i| Runner.find(i['ids']) }
+end
+
 MALE_FIRST_NAMES = %w(Jannick)
 FEMALE_FIRST_NAMES = %w()
 POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
@@ -88,45 +111,44 @@ POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
 POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
 
 def merge_duplicates
-  identifying_runner_attributes = [:first_name, :last_name, :nationality, :club_or_hometown, :sex]
-
   # Handle wrong sex, try to find correct correct sex using name list.
-  only_differing_sex = Runner.select(identifying_runner_attributes - [:sex])
-                           .group(identifying_runner_attributes - [:sex]).having('count(*) > 1')
-  only_differing_sex.each do |r|
-    correct_sex = if MALE_FIRST_NAMES.include?(r.first_name)
-                    'M'
-                  elsif FEMALE_FIRST_NAMES.include?(r.first_name)
-                    'W'
-                  else
-                    raise "Could not match gender to #{r}, please extend names list."
-                  end
-    correct_entry = Runner.where(sex: correct_sex).find_by!(r.serializable_hash.except('id'))
-    incorrect_entry = Runner.where.not(sex: correct_sex).find_by!(r.serializable_hash.except('id'))
-    merge_runners(correct_entry, incorrect_entry)
+  find_runners_only_differing_in(:sex).each do |entries|
+    if entries.size != 2
+      raise 'More than two possibilities, dont know what to do!'
+    end
+    # These are differentiated by age, go to next.
+    next if (entries.first.birth_date - entries.second.birth_date).abs > 10 * 365
+    first_name = entries.first.first_name
+    correct_entry, wrong_entry = if MALE_FIRST_NAMES.include?(first_name)
+                                   # M comes first, so ordering by sex will return it first.
+                                   entries.sort_by(&:sex)
+                                 elsif FEMALE_FIRST_NAMES.include?(first_name)
+                                   entries.sort_by(&:sex).reverse
+                                 else
+                                   raise "Could not match gender to #{entries}, please extend names list."
+                                 end
+    merge_runners(correct_entry, wrong_entry)
   end
 
   POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES.each do |attr|
-    only_differing_accents = Runner.select(identifying_runner_attributes - [attr] + ["f_unaccent(#{attr}) as unaccented"])
-                                 .group(identifying_runner_attributes - [attr] + ['unaccented'])
-                                 .having('count(*) > 1')
-    only_differing_accents.each do |r|
-      entries = Runner.where(r.serializable_hash.except('id', 'unaccented')).where("unaccent(#{attr}) = ?", r['unaccented'] )
+    merged_runners = 0
+    find_runners_only_differing_in(attr, ["f_unaccent(#{attr}) as unaccented"], ['unaccented']).each_with_index do |entries|
       if entries.size != 2
         raise 'More than two possibilities, dont know what to do!'
       end
       # The correct entry is the one with accents (most probably?),
       # so the one that is not equal to it's transliterated version.
-      correct_entry, wrong_entry = if entries.first[attr] == transliterate(entries.first[attr])
+      correct_entry, wrong_entry = if entries.first[attr] == ActiveSupport::Inflector.transliterate(entries.first[attr])
                                      [entries.second, entries.first]
-                                   elsif entries.second[attr] == transliterate(entries.second[attr])
+                                   elsif entries.second[attr] == ActiveSupport::Inflector.transliterate(entries.second[attr])
                                      [entries.first, entries.second]
                                    else
-                                     raise 'Couldnt find correct entry'
+                                     raise "Couldnt find correct entry for #{entries}"
                                    end
       merge_runners(correct_entry, wrong_entry)
+      merged_runners += 1
     end
-    puts "Merged #{only_differing_accents.size} entries based on accents of #{attr}."
+    puts "Merged #{merged_runners} entries based on accents of #{attr}."
   end
 
 
@@ -134,11 +156,8 @@ def merge_duplicates
   # Veronique	Plessis	Arc Et Senans
   # Veronique	Plessis	Arc et Senans
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES.each do |attr|
-    only_differing_case = Runner.select(identifying_runner_attributes - [attr] + ["f_unaccent(lower(#{attr})) as low"])
-                              .group(identifying_runner_attributes - [attr] + ['low'])
-                              .having('count(*) > 1')
-    only_differing_case.each do |r|
-      entries = Runner.where(r.serializable_hash.except('id', 'low')).where("f_unaccent(lower(#{attr})) = ?", r['low'] )
+    merged_runners = 0
+    find_runners_only_differing_in(attr, ["f_unaccent(lower(#{attr})) as low"], ['low']).each do |entries|
       if entries.size != 2
         raise 'More than two possibilities, dont know what to do!'
       end
@@ -152,16 +171,14 @@ def merge_duplicates
                                      [entries.second, entries.first]
                                    end
       merge_runners(correct_entry, wrong_entry)
+      merged_runners += 1
     end
-    puts "Merged #{only_differing_case.size} entries based on case of #{attr}."
+    puts "Merged #{merged_runners} entries based on case of #{attr}."
   end
 
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES.each do |attr|
-    only_differing_space = Runner.select(identifying_runner_attributes - [attr] + ["replace(#{attr}, '-', ' ') as spaced"])
-                               .group(identifying_runner_attributes - [attr] + ['spaced'])
-                               .having('count(*) > 1')
-    only_differing_space.each do |r|
-      entries = Runner.where(r.serializable_hash.except('id', 'spaced')).where("replace(#{attr}, '-', ' ') = ?", r['spaced'] )
+    merged_runners = 0
+    find_runners_only_differing_in(attr, ["replace(#{attr}, '-', ' ') as spaced"], ['spaced']).each do |entries|
       if entries.size != 2
         raise 'More than two possibilities, dont know what to do!'
       end
@@ -172,8 +189,9 @@ def merge_duplicates
                                      [entries.second, entries.first]
                                    end
       merge_runners(correct_entry, wrong_entry)
+      merged_runners += 1
     end
-    puts "Merged #{only_differing_space.size} entries based on spaces of #{attr}."
+    puts "Merged #{merged_runners} entries based on spaces of #{attr}."
   end
 
   # TODO: Try to fix club_or_hometown duplicates, e. g.
