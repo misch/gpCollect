@@ -11,16 +11,25 @@ module SeedHelpers
     end
   end
 
-  def find_or_create_runner_for(runner_hash, estimated_birth_date)
+  def find_or_create_runner_for(runner_hash, category)
     possible_matches = Runner.where(runner_hash)
+    estimated_birth_date = run_day.date - (category.age_max || category.age_min).years
     # Check which runner is closest in birth date
     closest_birth_date_diff, closest_birth_date_idx =
         possible_matches.map { |r| (r.birth_date - estimated_birth_date).abs }.each_with_index.min
-    if closest_birth_date_diff and closest_birth_date_diff < 10 * 365
-      possible_matches[closest_birth_date_idx]
-    else
-      Runner.create!(runner_hash.merge(birth_date: estimated_birth_date))
+    runner = if closest_birth_date_diff and closest_birth_date_diff < 10 * 365
+               possible_matches[closest_birth_date_idx]
+             else
+               Runner.new(runner_hash.merge(birth_date: estimated_birth_date))
+             end
+    if category.age_max and runner.birth_date < estimated_birth_date
+      # Estimated age is a lower bound here, update to it is higher than previous estimate.
+      runner.birth_date = estimated_birth_date
+    elsif category.age_min and runner.birth_date > estimated_birth_date
+      # Estimated age is an upper bound here, update to it is lower than previous estimate.
+      runner.birth_date = estimated_birth_date
     end
+    runner.save!
   end
 
   NAME_REGEXP = /(?<last_name>[^,]*), (?<first_name>[^(]+?) ?(?:\((?<nationality>[A-Z]*)\))?$/
@@ -68,9 +77,8 @@ module SeedHelpers
           next if category_hash.blank?
           category = Category.find_or_create_by!(category_hash)
           runner_hash[:sex] = category_hash[:sex]
-          estimated_birth_date = run_day.date - (category.age_max || category.age_min).years
-          runner = find_or_create_runner_for(runner_hash, estimated_birth_date)
 
+          runner = find_or_create_runner_for(runner_hash, category)
 
           # TODO: Somehow handle this over multiple years (allow change of hometown)
           #runner.update_attributes!(club_or_hometown: club_or_hometown)
