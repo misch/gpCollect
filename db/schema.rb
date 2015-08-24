@@ -54,12 +54,12 @@ ActiveRecord::Schema.define(version: 20150823081526) do
     t.string   "first_name"
     t.string   "last_name"
     t.date     "birth_date"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.string   "sex"
     t.string   "club_or_hometown"
     t.string   "nationality"
-    t.integer  "runs_count"
+    t.integer  "runs_count",       default: 0
   end
 
   add_index "runners", ["last_name"], name: "index_runners_on_last_name", using: :btree
