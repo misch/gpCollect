@@ -4,7 +4,10 @@ class RunnersController < ApplicationController
   # GET /runners
   # GET /runners.json
   def index
-    @runners = Runner.all.includes(:runs).page(params[:page])
+    respond_to do |format|
+      format.html
+      format.json { render json: RunnerDatatable.new(view_context) }
+    end
   end
 
   # GET /runners/1
