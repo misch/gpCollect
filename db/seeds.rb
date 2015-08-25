@@ -3,13 +3,10 @@ require_relative 'merge_runners_helpers'
 
 ActiveRecord::Base.logger = Logger.new File.open('log/development.log', 'a')
 
-Run.delete_all
-RunDay.delete_all
-Runner.delete_all
-Category.delete_all
-Route.delete_all
-Organizer.delete_all
-
+[Run, RunDay, Runner, Category, Route, Organizer].each do |model|
+  model.delete_all
+  ActiveRecord::Base.connection.reset_pk_sequence!(model.table_name)
+end
 
 route_16km = Route.create!(length: 16.093)
 gp_bern_organizer = Organizer.create!(name: "Grand Prix von Bern")
