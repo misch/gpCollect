@@ -10,7 +10,8 @@ module MergeRunnersHelpers
     identifying_runner_attributes_group = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, 'age']
     r = Runner.select(identifying_runner_attributes_select - [attr] + additional_attributes_select + ['array_agg(id) AS ids'])
             .group(identifying_runner_attributes_group - [attr] + additional_attributes_group).having('count(*) > 1')
-    r.map { |i| Runner.find(i['ids']) }
+    merge_candidates = r.map { |i| Runner.find(i['ids']) }
+    merge_candidates.select{|i| i.first[attr] != i.second[attr]}
   end
 
   MALE_FIRST_NAMES = %w(Jannick)
@@ -20,7 +21,7 @@ module MergeRunnersHelpers
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
 
   def self.merge_duplicates
-    # Handle wrong sex, try to find correct correct sex using name list.
+    # Handle wrong sex, try to find correct sex using name list.
     find_runners_only_differing_in(:sex).each do |entries|
       if entries.size != 2
         raise 'More than two possibilities, dont know what to do!'
