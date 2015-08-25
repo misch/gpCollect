@@ -52,15 +52,21 @@
                         week: '%H:%M:%S',
                         month: '%H:%M:%S',
                         year: '%H:%M:%S'
-                    }
+                    },
+                        yDateFormat: '%H:%M:%S',
+                        shared: true,
+                        yType: 'datetime'
                 },
                 tooltip: {
-                    yDateFormat: '%H:%M:%S',
-                    shared: true
+                    formatter: function() {
+                        return '<b>' + this.series.name +'</b><br/>' +
+                                Highcharts.dateFormat('%e. %b. %Y', new Date(this.x)) + '<br/>' +
+                                Highcharts.dateFormat('%H:%M:%S', new Date(this.y));
+                    }
                 },
                 series: [{
-                    //.order('run_days.date').references(:run_day)
-                    data: [<%= @runner.runs.includes(:run_day).reverse.map {|r| "[#{ruby_to_java_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
+                    name: "<%= @runner.first_name %> <%= @runner.last_name %>",
+                    data: [<%= @runner.runs.includes(:run_day).reverse.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
                 }]
             });
         });
