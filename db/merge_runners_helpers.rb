@@ -11,7 +11,7 @@ module MergeRunnersHelpers
     r = Runner.select(identifying_runner_attributes_select - [attr] + additional_attributes_select + ['array_agg(id) AS ids'])
             .group(identifying_runner_attributes_group - [attr] + additional_attributes_group).having('count(*) > 1')
     merge_candidates = r.map { |i| Runner.find(i['ids']) }
-    merge_candidates.select{|i| and i.first[attr] != i.second[attr]}
+    merge_candidates.select{|i| i.first[attr] != i.second[attr]}
   end
 
   MALE_FIRST_NAMES = %w(Jannick)
