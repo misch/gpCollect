@@ -21,6 +21,7 @@ module MergeRunnersHelpers
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
 
   def self.merge_duplicates
+    merged_runners = 0
     # Handle wrong sex, try to find correct sex using name list.
     find_runners_only_differing_in(:sex).each do |entries|
       if entries.size != 2
@@ -38,7 +39,9 @@ module MergeRunnersHelpers
                                      raise "Could not match gender to #{entries}, please extend names list."
                                    end
       merge_runners(correct_entry, wrong_entry)
+      merged_runners += 1
     end
+    puts "Merged #{merged_runners} entries based on sex."
 
     POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES.each do |attr|
       merged_runners = 0
