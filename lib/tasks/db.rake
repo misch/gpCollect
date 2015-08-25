@@ -11,10 +11,10 @@ namespace :db do
     # TODO: total is only estimate.
     progressbar = ProgressBar.create(total: 160, format: '%B %R pages/s, %a', :throttle_rate => 0.1)
 
-    CSV.open("db/data/#{year}", 'wb', col_sep: ';') do |csv|
+    CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
       while mech_page
         html_rows = mech_page.search('table.list-table tr')
-        rows = html_rows.map {|i| i.css('td').map { |td| td.content.strip.gsub('»', '') }}
+        rows = html_rows.map {|i| i.css('td').map { |td| td.content.gsub('»', '').strip }}
         rows.each {|row| csv << row }
         page_number += 1
         progressbar.increment
