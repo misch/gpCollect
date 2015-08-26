@@ -37,11 +37,11 @@
       <th>Category</th>
       <th>Duration</th>
       </thead>
-      <% @runner.runs.decorate.each do |run| %>
+      <% @runner.runs.each do |run| %>
           <tr>
             <td><%= I18n.l run.run_day.date %></td>
             <td><%= run.category.name %></td>
-            <td><%= run.duration %></td>
+            <td><%= run.duration_formatted %></td>
           </tr>
       <% end %>
     </table>

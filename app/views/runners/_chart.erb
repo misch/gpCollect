@@ -37,7 +37,7 @@
                 <% runners.each do |runner| %>
                 {
                     name: "<%= runner.first_name %> <%= runner.last_name %>",
-                    data: [<%= runner.runs.includes(:run_day).reverse.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
+                    data: [<%= runner.runs.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
                 },
                 <% end %>
             ]
