@@ -1,4 +1,5 @@
 require 'csv'
+
 module SeedHelpers
   # TODO: Possibly handle disqualified cases better.
   # Right now they have nil as duration (but still have an entry in the run table).
@@ -78,6 +79,9 @@ module SeedHelpers
         category_string = line[5 + shift]
         runner_hash[:club_or_hometown] = line[6 + shift]
         duration_string = line[10 + shift]
+
+        # Don't create a runner/run if there is no category or duration associated.
+        next if category_string.blank? or duration_string.blank?
         begin
           # E. g. 'Abati, Mauro (SUI)'
           m = NAME_REGEXP.match name
@@ -94,8 +98,6 @@ module SeedHelpers
             end
           end
 
-          # Don't create a runner/run if there is no category or duration associated.
-          next if category_string.blank? or duration_string.blank?
           category = find_or_create_category_for(category_string)
           runner_hash[:sex] = category.sex
 
