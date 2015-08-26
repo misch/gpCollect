@@ -35,7 +35,9 @@ module SeedHelpers
 
   def self.find_or_create_runner_for(runner_hash, run_day, category)
     # only possible matches are runners that match all attribute and don't have a run already registered on that day.
-    possible_matches = Runner.includes(:run_days).where(runner_hash).where('run_days.id != ?', run_day.id).references(:run_days)
+    possible_matches = Runner.where(runner_hash)
+    possible_matches = possible_matches.reject {|r| r.runs.any? {|run| run.run_day == run_day}}
+
     estimated_birth_date = run_day.date - (category.age_max || category.age_min).years
     # Check which runner is closest in birth date
     closest_birth_date_diff, closest_birth_date_idx =
