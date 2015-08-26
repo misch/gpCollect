@@ -17,7 +17,16 @@ namespace :db do
       CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
         while mech_page
           html_rows = mech_page.search('table.list-table tr')
-          rows = html_rows.map {|i| i.css('td').map { |td| td.content.gsub('»', '').strip }}
+          rows = html_rows.map {|i| i.css('td').map do |td|
+            # Once in a while an attribute is truncated, marked by trailing '...'.
+            # The full string can then be parsed by getting the title attribute of the span contained.
+            if td.content.include? '...'
+              td.css('span')[0][:title]
+            else
+              td.content
+            end.gsub('»', '').strip
+          end
+          }
           rows.each {|row| csv << row }
           page_number += 1
           progressbar.increment
