@@ -23,6 +23,8 @@ gem 'ajax-datatables-rails'
 gem 'turbolinks'
 # For easier initialization
 gem 'jquery-turbolinks'
+# For charts
+gem "highcharts-rails"
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
