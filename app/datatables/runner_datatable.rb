@@ -4,7 +4,8 @@ class RunnerDatatable < AjaxDatatablesRails::Base
 
   def sortable_columns
     # Declare strings in this format: ModelName.column_name
-    @sortable_columns ||= ['Runner.first_name', 'Runner.last_name', 'Runner.club_or_hometown', 'Runner.sex', 'Runner.runs_count']
+    @sortable_columns ||= ['Runner.first_name', 'Runner.last_name', 'Runner.club_or_hometown', 'Runner.sex',
+                           'Runner.nationality', 'Runner.runs_count']
   end
 
   def searchable_columns
@@ -21,14 +22,16 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           record.last_name,
           record.club_or_hometown,
           record.sex,
+          record.nationality,
           record.runs_count,
-          link_to('Show', runner_path(record))
+          record.fastest_run.decorate.duration,
+          record.birth_date.try(:year).to_s + record.categories.map(&:name).join(', ') + link_to('Show', runner_path(record))
       ]
     end
   end
 
   def get_raw_records
-    Runner.all.includes(:runs)
+    Runner.all.includes(:runs, :categories)
   end
 
   # Overrides the filter method defined from the gem. When searching, we ignore all accents, so a search for 'théo'
@@ -47,11 +50,9 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           unaccented_column.matches(::Arel::Nodes::NamedFunction.new('f_unaccent', [::Arel::Nodes::build_quoted(term)]))
         end.reduce(:or)
       end.reduce(:and)
-
       records.where(where_clause)
     else
       records
     end
   end
-  # ==== Insert 'presenter'-like methods below if necessary
 end
