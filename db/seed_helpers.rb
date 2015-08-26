@@ -58,8 +58,15 @@ module SeedHelpers
 
   NAME_REGEXP = /(?<last_name>[^,]*), (?<first_name>[^(]+?) ?(?:\((?<nationality>[A-Z]*)\))?$/
 
+  # Seeds a file with the given options. Options are expected to have the following keys:
+  # * file: The file to be seeded
+  # * run_day: The run day the runs to be seeded belong to
+  #
+  # Optionally taking the following keys:
+  # * shift: Additional shift of read out columns, if format does not match exactly.
   def self.seed_runs_file(options)
     file = options.fetch(:file)
+    shift = options.fetch(:shift, 0)
     puts "Seeding #{file} "
     progressbar = ProgressBar.create(total: `wc -l #{file}`.to_i, format: '%B %R runs/s, %a',
                                      :throttle_rate => 0.1)
@@ -67,9 +74,10 @@ module SeedHelpers
     ActiveRecord::Base.transaction do
       CSV.open(file, headers: true, col_sep: ';').each do |line|
         runner_hash = {}
-        name = line[4]
-        category_string = line[5]
-        runner_hash[:club_or_hometown] = line[6]
+        name = line[4 + shift]
+        category_string = line[5 + shift]
+        runner_hash[:club_or_hometown] = line[6 + shift]
+        duration_string = line[10 + shift]
         begin
           # E. g. 'Abati, Mauro (SUI)'
           m = NAME_REGEXP.match name
@@ -82,11 +90,10 @@ module SeedHelpers
             if name.match /\([A-Z]{3}\)/
               next
             else
-              raise 'Did not match!'
+              raise 'Could not parse name: ' + name
             end
           end
 
-          duration_string = line[10]
           # Don't create a runner/run if there is no category or duration associated.
           next if category_string.blank? or duration_string.blank?
           category = find_or_create_category_for(category_string)

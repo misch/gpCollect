@@ -16,7 +16,12 @@ namespace :db do
 
       CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
         while mech_page
-          html_rows = mech_page.search('table.list-table tr')
+          html_rows = if page == 1
+                        # For first page, also parse table header
+                        mech_page.search('table.list-table tr')
+                      else
+                        mech_page.search('table.list-table tbody tr')
+                      end
           rows = html_rows.map {|i| i.css('td').map do |td|
             # Once in a while an attribute is truncated, marked by trailing '...'.
             # The full string can then be parsed by getting the title attribute of the span contained.
