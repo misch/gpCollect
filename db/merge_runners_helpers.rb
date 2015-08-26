@@ -61,7 +61,7 @@ module MergeRunnersHelpers
         correct_entry = entries.max_by { |entry| count_accents(entry[attr]) }
         wrong_entries = entries.reject { |entry| entry == correct_entry }
         wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
-        merged_runners += 1
+        merged_runners += wrong_entries.size
       end
       puts "Merged #{merged_runners} entries based on accents of #{attr}."
     end
