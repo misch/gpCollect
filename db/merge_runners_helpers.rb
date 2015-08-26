@@ -64,6 +64,7 @@ module MergeRunnersHelpers
             correct_entry = entries.first
             entries[1..-1].each do |runner_entry|
               merge_runners(correct_entry,runner_entry)
+              merged_runners += 1
             end
           else
             raise "More than two possibilities, dont know what to do for #{entries}"
@@ -76,11 +77,13 @@ module MergeRunnersHelpers
                                        elsif count_accents(entries.first[attr]) > count_accents(entries.second[attr])
                                          [entries.first, entries.second]
                                        else
+                                         # todo: somehow handle this, because it's not an uncommon case. E.g. Michèl and Michél, or Gière and Gieré
                                          raise "Couldnt find correct entry for #{entries}"
                                        end
+          merge_runners(correct_entry, wrong_entry)
+          merged_runners += 1
         end
-        merge_runners(correct_entry, wrong_entry)
-        merged_runners += 1
+
       end
       puts "Merged #{merged_runners} entries based on accents of #{attr}."
     end
