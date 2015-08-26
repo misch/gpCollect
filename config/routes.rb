@@ -1,7 +1,14 @@
 Rails.application.routes.draw do
   resources :categories
   resources :runs
-  resources :runners
+  resources :runners do
+    member do
+      get 'remember'
+    end
+    collection do
+      get 'show_remembered'
+    end
+  end
   get 'welcome/index'
 
   # The priority is based upon order of creation: first created -> highest priority.

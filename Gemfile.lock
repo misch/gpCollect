@@ -80,6 +80,8 @@ GEM
       request_store (~> 1.0)
     erubis (2.7.0)
     execjs (2.6.0)
+    font-awesome-rails (4.4.0.0)
+      railties (>= 3.2, < 5.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     highcharts-rails (4.1.5)
@@ -224,6 +226,7 @@ DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
   draper
+  font-awesome-rails
   highcharts-rails
   jbuilder (~> 2.0)
   jquery-datatables-rails!

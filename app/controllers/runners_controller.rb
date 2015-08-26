@@ -1,5 +1,5 @@
 class RunnersController < ApplicationController
-  before_action :set_runner, only: [:show, :edit, :update, :destroy]
+  before_action :set_runner, only: [:show, :edit, :update, :destroy, :remember]
 
   # GET /runners
   # GET /runners.json
@@ -64,10 +64,21 @@ class RunnersController < ApplicationController
     end
   end
 
+  def remember
+    session[:runner_ids] ||= []
+    session[:runner_ids] << @runner.id
+    session[:runner_ids].uniq!
+    render json: @runner
+  end
+
+  def show_remembered
+    @runners = Runner.find(session[:runner_ids])
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_runner
-      @runner = Runner.find(params[:id])
+      @runner = Runner.includes(runs: [:category, :run_day]).find(params[:id]).decorate
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

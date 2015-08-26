@@ -1,6 +1,6 @@
 class RunnerDatatable < AjaxDatatablesRails::Base
   include ActiveRecord::Sanitization::ClassMethods
-  def_delegators :@view, :runner_path, :link_to
+  def_delegators :@view, :runner_path, :remember_runner_path, :link_to, :fa_icon
 
   def sortable_columns
     # Declare strings in this format: ModelName.column_name
@@ -24,8 +24,9 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           record.sex,
           record.nationality,
           record.runs_count,
-          record.fastest_run.decorate.duration,
-          record.birth_date.try(:year).to_s + record.categories.map(&:name).join(', ') + link_to('Show', runner_path(record))
+          record.fastest_run.decorate.duration_formatted,
+          link_to(fa_icon('eye lg'), runner_path(record)) + ' ' +
+              link_to(fa_icon('star lg'), remember_runner_path(record), remote: true)
       ]
     end
   end

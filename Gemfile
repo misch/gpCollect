@@ -24,7 +24,9 @@ gem 'turbolinks'
 # For easier initialization
 gem 'jquery-turbolinks'
 # For charts
-gem "highcharts-rails"
+gem 'highcharts-rails'
+# Awesome icons
+gem 'font-awesome-rails'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
@@ -45,7 +47,7 @@ gem 'draper'
 gem 'ruby-progressbar'
 
 # For heroku configuration
-gem 'rails_12factor'
+gem 'rails_12factor', group: :production
 
 # For scraping web.
 gem 'mechanize'
