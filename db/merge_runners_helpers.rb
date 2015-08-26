@@ -53,16 +53,32 @@ module MergeRunnersHelpers
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(#{attr}) as unaccented"], ['unaccented']).each_with_index do |entries|
         if entries.size != 2
-          raise "More than two possibilities, dont know what to do for #{entries}"
+          run_days = []
+          entries.each do |runner_entry|
+            run_days.append(runner_entry.runs.map {|run| run.run_day})
+          end
+
+          if run_days.uniq.length == run_days.length
+            # I have no idea how to determine which one might be correct, e.g. in the case of Michel, Michèl and Michél.
+            # For now, just take the first one.
+            correct_entry = entries.first
+            entries[1..-1].each do |runner_entry|
+              merge_runners(correct_entry,runner_entry)
+            end
+          else
+            raise "More than two possibilities, dont know what to do for #{entries}"
+          end
+
+        else
+          # The correct entry is the one with more accents (probably?).
+          correct_entry, wrong_entry = if count_accents(entries.first[attr]) < count_accents(entries.second[attr])
+                                         [entries.second, entries.first]
+                                       elsif count_accents(entries.first[attr]) > count_accents(entries.second[attr])
+                                         [entries.first, entries.second]
+                                       else
+                                         raise "Couldnt find correct entry for #{entries}"
+                                       end
         end
-        # The correct entry is the one with more accents (probably?).
-        correct_entry, wrong_entry = if count_accents(entries.first[attr]) < count_accents(entries.second[attr])
-                                       [entries.second, entries.first]
-                                     elsif count_accents(entries.first[attr]) > count_accents(entries.second[attr])
-                                       [entries.first, entries.second]
-                                     else
-                                       raise "Couldnt find correct entry for #{entries}"
-                                     end
         merge_runners(correct_entry, wrong_entry)
         merged_runners += 1
       end
