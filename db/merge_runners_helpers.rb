@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module MergeRunnersHelpers
   def self.merge_runners(runner, to_be_merged_runner)
     runner.runs += to_be_merged_runner.runs
@@ -14,8 +15,13 @@ module MergeRunnersHelpers
     merge_candidates.select{|i| i.first[attr] != i.second[attr]}
   end
 
-  MALE_FIRST_NAMES = %w(Jannick)
-  FEMALE_FIRST_NAMES = %w()
+  def self.count_accents(string)
+    # [[:alpha:]] will match accented characters, \w will not.
+    (string.scan(/[[:alpha:]]/) - string.scan(/\w/)).size
+  end
+
+  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael)
+  FEMALE_FIRST_NAMES = %w(Denise Tabea)
   POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
@@ -25,7 +31,7 @@ module MergeRunnersHelpers
     # Handle wrong sex, try to find correct sex using name list.
     find_runners_only_differing_in(:sex).each do |entries|
       if entries.size != 2
-        raise 'More than two possibilities, dont know what to do!'
+        raise "More than two possibilities, dont know what to do for #{entries}"
       end
       # These are differentiated by age, go to next.
       next if (entries.first.birth_date - entries.second.birth_date).abs > 10 * 365
@@ -47,13 +53,12 @@ module MergeRunnersHelpers
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(#{attr}) as unaccented"], ['unaccented']).each_with_index do |entries|
         if entries.size != 2
-          raise 'More than two possibilities, dont know what to do!'
+          raise "More than two possibilities, dont know what to do for #{entries}"
         end
-        # The correct entry is the one with accents (most probably?),
-        # so the one that is not equal to it's transliterated version.
-        correct_entry, wrong_entry = if entries.first[attr] == ActiveSupport::Inflector.transliterate(entries.first[attr])
+        # The correct entry is the one with more accents (probably?).
+        correct_entry, wrong_entry = if count_accents(entries.first[attr]) < count_accents(entries.second[attr])
                                        [entries.second, entries.first]
-                                     elsif entries.second[attr] == ActiveSupport::Inflector.transliterate(entries.second[attr])
+                                     elsif count_accents(entries.first[attr]) > count_accents(entries.second[attr])
                                        [entries.first, entries.second]
                                      else
                                        raise "Couldnt find correct entry for #{entries}"
@@ -72,7 +77,7 @@ module MergeRunnersHelpers
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(lower(#{attr})) as low"], ['low']).each do |entries|
         if entries.size != 2
-          raise 'More than two possibilities, dont know what to do!'
+          raise "More than two possibilities, dont know what to do for #{entries}"
         end
         # We take the one with more lowercase characters as he correct one. E. g. for
         # Reichenbach I. K.
@@ -93,7 +98,7 @@ module MergeRunnersHelpers
       merged_runners = 0
       find_runners_only_differing_in(attr, ["replace(#{attr}, '-', ' ') as spaced"], ['spaced']).each do |entries|
         if entries.size != 2
-          raise 'More than two possibilities, dont know what to do!'
+          raise "More than two possibilities, dont know what to do for #{entries}"
         end
         # We take the one with more spaces as he correct one.
         correct_entry, wrong_entry = if entries.first[attr].scan(/ /).size > entries.second[attr].scan(/ /).size
