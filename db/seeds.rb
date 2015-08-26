@@ -13,11 +13,11 @@ gp_bern_organizer = Organizer.find_or_create_by!(name: 'Grand Prix von Bern')
 
 files = [
     {file: "db/data/gp_bern_10m_2009.csv", shift: -1,
-     run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2012, 4, 18), route: route_16km)},
+     run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2009, 4, 18), route: route_16km)},
     {file: "db/data/gp_bern_10m_2010.csv", shift: -1,
-     run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2012, 5, 22), route: route_16km)},
+     run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2010, 5, 22), route: route_16km)},
     {file: "db/data/gp_bern_10m_2011.csv", shift: -1,
-     run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2012, 5, 14), route: route_16km)},
+     run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2011, 5, 14), route: route_16km)},
     {file: "db/data/gp_bern_10m_2012.csv", shift: -1,
      run_day: RunDay.create!(organizer: gp_bern_organizer, date: Date.new(2012, 5, 12), route: route_16km)},
     {file: "db/data/gp_bern_10m_2013.csv",
