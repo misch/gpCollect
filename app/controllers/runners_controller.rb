@@ -1,5 +1,5 @@
 class RunnersController < ApplicationController
-  before_action :set_runner, only: [:show, :edit, :update, :destroy]
+  before_action :set_runner, only: [:show, :edit, :update, :destroy, :remember]
 
   # GET /runners
   # GET /runners.json
@@ -62,6 +62,17 @@ class RunnersController < ApplicationController
       format.html { redirect_to runners_url, notice: 'Runner was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def remember
+    session[:runner_ids] ||= []
+    session[:runner_ids] << @runner.id
+    session[:runner_ids].uniq!
+    render json: @runner
+  end
+
+  def show_remembered
+    @runners = Runner.find(session[:runner_ids])
   end
 
   private
