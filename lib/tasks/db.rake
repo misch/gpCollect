@@ -5,10 +5,15 @@ require 'csv'
 namespace :db do
   desc "Scrapes data from the public website and writes it to a csv file."
   task scrape_data: :environment do
-    COMPATIBLE_YEARS = (2009..2012)
+    COMPATIBLE_YEARS = (2007..2012)
     COMPATIBLE_YEARS.each do |year|
       agent = Mechanize.new
-      mech_page = agent.get("http://bern.mikatiming.de/#{year}/?page=1&event=GP&num_results=100&pid=search&search%5Bclub%5D=%25&search%5Bage_class%5D=%25&search%5Bsex%5D=%25&search%5Bnation%5D=%25&search%5Bstate%5D=%25&search_sort=name")
+      url = if year <= 2008
+              "http://results.mikatiming.de/#{year}/bern/index.php?page=1&content=search&event=GP&lang=DE&num_results=100&search[name]=&search[firstname]=&search[club]=&search[nation]=&search[start_no]=&search[city]=&search[region]=&search_sort=name&search_sort_order=ASC&split=FINISHNET"
+            else
+              "http://bern.mikatiming.de/#{year}/?page=1&event=GP&num_results=100&pid=search&search%5Bclub%5D=%25&search%5Bage_class%5D=%25&search%5Bsex%5D=%25&search%5Bnation%5D=%25&search%5Bstate%5D=%25&search_sort=name"
+            end
+      mech_page = agent.get(url)
       page_number = 1
       # TODO: total is only estimate.
       progressbar = ProgressBar.create(title: "Scraping #{year}", total: 160,
@@ -18,9 +23,9 @@ namespace :db do
         while mech_page
           html_rows = if page_number == 1
                         # For first page, also parse table header
-                        mech_page.search('table.list-table tr')
+                        mech_page.search('table tr')
                       else
-                        mech_page.search('table.list-table tbody tr')
+                        mech_page.search('table tbody tr')
                       end
           rows = html_rows.map {|i| i.css('td').map do |td|
             # Once in a while an attribute is truncated, marked by trailing '...'.
