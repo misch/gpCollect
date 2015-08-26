@@ -11,8 +11,12 @@ module MergeRunnersHelpers
     identifying_runner_attributes_group = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, 'age']
     r = Runner.select(identifying_runner_attributes_select - [attr] + additional_attributes_select + ['array_agg(id) AS ids'])
             .group(identifying_runner_attributes_group - [attr] + additional_attributes_group).having('count(*) > 1')
-    merge_candidates = r.map { |i| Runner.find(i['ids']) }
-    merge_candidates.select{|i| i.first[attr] != i.second[attr]}
+    # Each merge candidate consists of multiple runners, retrieve these runners from database here.
+    merge_candidates = r.map { |i| Runner.includes(:run_days).find(i['ids']) }
+    # Only select the runners as merge candidates that differ in the queried attribute.
+    merge_candidates.select! {|i| i.first[attr] != i.second[attr]}
+    # Only select runners for merging that have no overlapping run days.
+    merge_candidates.select {|i| i.all? {|fixed_runner| (i - [fixed_runner]).all? { |other_runner| (fixed_runner.run_days & other_runner.run_days).empty? }}}
   end
 
   def self.count_accents(string)
@@ -52,18 +56,11 @@ module MergeRunnersHelpers
     POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES.each do |attr|
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(#{attr}) as unaccented"], ['unaccented']).each_with_index do |entries|
-        if entries.size != 2
-          raise "More than two possibilities, dont know what to do for #{entries}"
-        end
+
         # The correct entry is the one with more accents (probably?).
-        correct_entry, wrong_entry = if count_accents(entries.first[attr]) < count_accents(entries.second[attr])
-                                       [entries.second, entries.first]
-                                     elsif count_accents(entries.first[attr]) > count_accents(entries.second[attr])
-                                       [entries.first, entries.second]
-                                     else
-                                       raise "Couldnt find correct entry for #{entries}"
-                                     end
-        merge_runners(correct_entry, wrong_entry)
+        correct_entry = entries.max_by { |entry| count_accents(entry[attr]) }
+        wrong_entries = entries.reject { |entry| entry == correct_entry }
+        wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
         merged_runners += 1
       end
       puts "Merged #{merged_runners} entries based on accents of #{attr}."
