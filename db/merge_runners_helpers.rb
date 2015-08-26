@@ -50,6 +50,7 @@ module MergeRunnersHelpers
     puts "Merged #{merged_runners} entries based on sex."
 
     POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES.each do |attr|
+      #TODO handle the case of having more than one versions of an attribute with the same number of accents
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(#{attr}) as unaccented"], ['unaccented']).each_with_index do |entries|
         if entries.size != 2
@@ -60,8 +61,9 @@ module MergeRunnersHelpers
 
           if run_days.uniq.length == run_days.length
             # I have no idea how to determine which one might be correct, e.g. in the case of Michel, Michèl and Michél.
-            # For now, just take the first one.
-            correct_entry = entries.first
+            # For now, just take (the) one with the most accents.
+            correct_entry = entries.max_by { |entry| count_accents(entry[attr]) }
+            wrong_entries = entries.reject { |entry| entry == correct_entry }
             entries[1..-1].each do |runner_entry|
               merge_runners(correct_entry,runner_entry)
               merged_runners += 1
@@ -74,11 +76,8 @@ module MergeRunnersHelpers
           # The correct entry is the one with more accents (probably?).
           correct_entry, wrong_entry = if count_accents(entries.first[attr]) < count_accents(entries.second[attr])
                                          [entries.second, entries.first]
-                                       elsif count_accents(entries.first[attr]) > count_accents(entries.second[attr])
+                                       else # if both have the same number of accents, just take the first as the correct entry.
                                          [entries.first, entries.second]
-                                       else
-                                         # todo: somehow handle this, because it's not an uncommon case. E.g. Michèl and Michél, or Gière and Gieré
-                                         raise "Couldnt find correct entry for #{entries}"
                                        end
           merge_runners(correct_entry, wrong_entry)
           merged_runners += 1
