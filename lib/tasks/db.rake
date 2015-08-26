@@ -16,7 +16,7 @@ namespace :db do
 
       CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
         while mech_page
-          html_rows = if page == 1
+          html_rows = if page_number == 1
                         # For first page, also parse table header
                         mech_page.search('table.list-table tr')
                       else
