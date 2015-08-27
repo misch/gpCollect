@@ -55,9 +55,33 @@ RSpec.describe 'scrape_helpers' do
     expect(last_name).to eq('Meier')
   end
 
-  it 'should split names with van/von der lastname ' do
+  it 'should split names with last_name = "van/von der"  ' do
     last_name, first_name = ScrapeHelpers::split_name('von der Heide Helen')
     expect(first_name).to eq('Helen')
     expect(last_name).to eq('von der Heide')
+
+    last_name, first_name = ScrapeHelpers::split_name('Van der Sluis Jan')
+    expect(first_name).to eq('Jan')
+    expect(last_name).to eq('Van der Sluis')
+  end
+
+  it 'should split names with last_name = "van/von/di/de/... "  ' do
+    last_name, first_name = ScrapeHelpers::split_name('van Empden Carsten')
+    expect(first_name).to eq('Carsten')
+    expect(last_name).to eq('van Empden')
+
+    last_name, first_name = ScrapeHelpers::split_name('von Niederhäusern Marianne')
+    expect(first_name).to eq('Marianne')
+    expect(last_name).to eq('von Niederhäusern')
+  end
+
+  it 'should split names with more than one last_name and/or first_name in the middle  ' do
+    last_name, first_name = ScrapeHelpers::split_name('Aridi Rudolf Ameline')
+    expect(first_name).to eq('Rudolf Ameline') # in this case, it doesn't work correcty
+    expect(last_name).to eq('Aridi')
+
+    last_name, first_name = ScrapeHelpers::split_name('Alder Pascal Janik')
+    expect(first_name).to eq('Pascal Janik')
+    expect(last_name).to eq('Alder')
   end
 end

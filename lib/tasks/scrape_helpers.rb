@@ -56,16 +56,24 @@ module ScrapeHelpers
     [rank, rank_category, nil, start_number, csv_name, category, club_or_hometown, km5, nil, nil, time, birth_year]
   end
 
+  COMPOSED_LAST_NAME_STARTERS = ['van ', 'von ', 'di ', 'de ', 'el ' 'le ', 'del ', 'du ', 'des ', 'le ', 'la ', 'della ', 'dalla ']
   # A name consists of a last_name and a first_name. Each can contain multiple words, e.g.
   # e.g. Van Der Sluis Jan --> [Van Der Sluis, Jan]
   def self.split_name(name)
-    splitted = name.split
-    if splitted.size == 2
-      splitted
+    name_array = name.split
+    if name_array.size == 2
+      name_array
     else
-      if name.lower.start_with?(['van der, von der'])
-        splitted[0..1].join(' '), splitted[2..-1]
+      case
+        when name.downcase.start_with?('van der', 'von der', 'auf der')
+          [name_array[0..2].join(' '), name_array[3..-1].join(' ')]
+        when  name.downcase.start_with?(*COMPOSED_LAST_NAME_STARTERS)
+          [name_array[0..1].join(' '), name_array[2..-1].join(' ')]
+        else
+          split_position = name_array.size/2 -1
+          [name_array[0..split_position].join(' '), name_array[split_position+1..-1].join(' ')]
       end
+
     end
   end
 
