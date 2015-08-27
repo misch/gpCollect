@@ -27,7 +27,7 @@ namespace :db do
                       else
                         mech_page.search('table tbody tr')
                       end
-          rows = html_rows.map {|i| i.css('td').map do |td|
+          rows = html_rows.map { |i| i.css('td').map do |td|
             # Once in a while an attribute is truncated, marked by trailing '...'.
             # The full string can then be parsed by getting the title attribute of the span contained.
             if td.content.include? '...'
@@ -37,7 +37,7 @@ namespace :db do
             end.gsub('»', '').strip
           end
           }
-          rows.each {|row| csv << row }
+          rows.each { |row| csv << row }
           page_number += 1
           progressbar.increment
           next_link = mech_page.link_with(:text => page_number.to_s)
@@ -48,13 +48,17 @@ namespace :db do
       progressbar.finish
     end
     # Parses very old years
-    pp doc.css('pre').text.split("\r\n").map {|row| row.split(/ {2,}/) };
+    pp doc.css('pre').text.split("\r\n").map { |row| row.split(/ {2,}/) };
   end
 
   task scrape_old_data: :environment do
     require 'open-uri'
-    year = 1999
-    CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
+    COMPATIBLE_YEARS = (1999..2006)
+    STOP_WORDS = ['Total', 'Grand Prix', 'Kategorie', '-------', 'Stand', 'Rangliste']
+    COMPATIBLE_YEARS.each do |year|
+      progressbar = ProgressBar.create(title: "Scraping #{year}", total: 26,
+                                       format: '%t %B %R pages/s, %a', :throttle_rate => 0.1)
+      CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
         ('A'..'Z').each do |character|
           url = if year == 2000
                   "http://services.datasport.com/#{year}/lauf/gp/Rangliste/ALFA#{character}.HTM"
@@ -62,15 +66,37 @@ namespace :db do
                   "http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"
                 end
           doc = Nokogiri::HTML(open(url))
-          rows = doc.css('pre').text.split("\r\n").map {|row| row.split(/[ (]{2,}/) }
-          rows.each_with_index do |row, idx|
-            next if idx == 0 or row.first.match /------------/ # skip header, filler rows
-            csv_row = ScrapeHelpers::old_html_row_to_csv_row(row)
-            unless csv_row.nil?
-              csv << csv_row
+          text_block = doc.css('pre')
+          if text_block.css('pre')
+            # For some version, the data is in a 'pre' tag inside a 'pre' tag.
+            text_block = text_block.css('pre')
+          end
+          rows = text_block.text.split("\r\n").map { |row| row.split(/[¦ (]{2,}/) }
+          options = if year >= 2001
+                      {start_number_column: 5}
+                    else
+                      {}
+                    end
+          rows.each do |row|
+            # skip header, filler rows, disqualified
+            next if row.size == 0 or
+                STOP_WORDS.any? {|stop_word| row[0].include?(stop_word) } or
+                %w(DNF DSQ ---).any? { |disq_marker| row[1] == disq_marker }
+
+            begin
+              csv_row = ScrapeHelpers::old_html_row_to_csv_row(row, options)
+              unless csv_row.nil?
+                csv << csv_row
+              end
+            rescue Exception => e
+              puts "Failed on #{row}"
+              raise e
             end
           end
+          progressbar.increment
         end
+        progressbar.finish
+      end
     end
   end
 end
