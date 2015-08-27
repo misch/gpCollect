@@ -31,8 +31,9 @@ module ScrapeHelpers
     name_location_matches = NAME_LOCATION_REGEXP.match(row[1])
     rank_category = name_location_matches[:rank_category]
     name = name_location_matches[:name]
-    # TODO: convert name to csv name format.
-    csv_name = name
+
+    # convert name to csv name format.
+    csv_name = split_name(name).join(', ')
 
     birth_year, club_or_hometown = row[2].split(' ')
     club_or_hometown ||= name_location_matches[:location]
@@ -59,6 +60,7 @@ module ScrapeHelpers
   COMPOSED_LAST_NAME_STARTERS = ['van ', 'von ', 'di ', 'de ', 'el ' 'le ', 'del ', 'du ', 'des ', 'le ', 'la ', 'della ', 'dalla ']
   # A name consists of a last_name and a first_name. Each can contain multiple words, e.g.
   # e.g. Van Der Sluis Jan --> [Van Der Sluis, Jan]
+  # returns [last_name, first_name]
   def self.split_name(name)
     name_array = name.split
     if name_array.size == 2
