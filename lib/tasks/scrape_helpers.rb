@@ -12,18 +12,19 @@ module ScrapeHelpers
     return nil unless is_gp
     category = row[0]
     name_location_matches = NAME_LOCATION_REGEXP.match(row[1])
+    rank_category = name_location_matches[:rank_category]
     name = name_location_matches[:name]
     # TODO: convert name to csv name format.
     csv_name = nil
 
-    rank_category = name_location_matches[:rank_category]
+    birth_year, club_or_hometown = row[2].split(' ')
+    club_or_hometown ||= name_location_matches[:location]
 
-    club_or_hometown = row[2].presence || name_location_matches[:location]
     time_rank_matches = TIME_RANK_REGEXP.match(row[3])
     start_number = time_rank_matches[:start_number]
     time = time_rank_matches[:time]
 
     rank = RUN_TYPE_OVERALL_RANK_REGEXP.match(row[4])[:rank]
-    [rank, rank_category, nil, start_number, csv_name, category, club_or_hometown, nil, nil, nil, time]
+    [rank, rank_category, nil, start_number, csv_name, category, club_or_hometown, nil, nil, nil, time, birth_year]
   end
 end

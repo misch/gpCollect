@@ -59,8 +59,10 @@ namespace :db do
           doc = Nokogiri::HTML(open("http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"))
           rows = doc.css('pre').text.split("\r\n").map {|row| row.split(/ {2,}/) }
           rows.each do |row|
-            ScrapeHelpers::old_html_row_to_csv_row(row)
-
+            csv_row = ScrapeHelpers::old_html_row_to_csv_row(row)
+            unless csv_row.nil?
+              csv << csv_row
+            end
           end
         end
     end
