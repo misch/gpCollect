@@ -56,9 +56,15 @@ namespace :db do
     year = 1999
     CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
         ('A'..'Z').each do |character|
-          doc = Nokogiri::HTML(open("http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"))
-          rows = doc.css('pre').text.split("\r\n").map {|row| row.split(/ {2,}/) }
-          rows.each do |row|
+          url = if year == 2000
+                  "http://services.datasport.com/#{year}/lauf/gp/Rangliste/ALFA#{character}.HTM"
+                else
+                  "http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"
+                end
+          doc = Nokogiri::HTML(open(url))
+          rows = doc.css('pre').text.split("\r\n").map {|row| row.split(/[ (]{2,}/) }
+          rows.each_with_index do |row, idx|
+            next if idx == 0 or row.first.match /------------/ # skip header, filler rows
             csv_row = ScrapeHelpers::old_html_row_to_csv_row(row)
             unless csv_row.nil?
               csv << csv_row
