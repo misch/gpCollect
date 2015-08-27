@@ -1,6 +1,6 @@
 require 'mechanize'
 require 'csv'
-
+require_relative 'scrape_helpers'
 
 namespace :db do
   desc "Scrapes data from the public website and writes it to a csv file."
@@ -46,6 +46,23 @@ namespace :db do
         end
       end
       progressbar.finish
+    end
+    # Parses very old years
+    pp doc.css('pre').text.split("\r\n").map {|row| row.split(/ {2,}/) };
+  end
+
+  task scrape_old_data: :environment do
+    require 'open-uri'
+    year = 1999
+    CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
+        ('A'..'Z').each do |character|
+          doc = Nokogiri::HTML(open("http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"))
+          rows = doc.css('pre').text.split("\r\n").map {|row| row.split(/ {2,}/) }
+          rows.each do |row|
+            ScrapeHelpers::old_html_row_to_csv_row(row)
+
+          end
+        end
     end
   end
 end
