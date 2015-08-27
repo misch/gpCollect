@@ -5,6 +5,6 @@ class Runner < ActiveRecord::Base
   has_many :run_days, through: :runs
 
   def fastest_run
-    runs.min_by &:duration
+    runs.min_by { |i| i.duration || 0 }
   end
 end
