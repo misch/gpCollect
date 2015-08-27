@@ -66,32 +66,32 @@ namespace :db do
                   "http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"
                 end
           doc = Nokogiri::HTML(open(url))
-          text_block = doc.css('pre')
-          if text_block.css('pre')
-            # For some version, the data is in a 'pre' tag inside a 'pre' tag.
-            text_block = text_block.css('pre')
-          end
-          rows = text_block.text.split("\r\n").map { |row| row.split(/[¦ (]{2,}/) }
-          options = if year >= 2001
-                      {start_number_column: 5}
-                    else
-                      {}
-                    end
-          rows.each do |row|
-            # skip header, filler rows, disqualified
-            next if row.size == 0 or
-                STOP_WORDS.any? {|stop_word| row[0].include?(stop_word) } or
-                %w(DNF DSQ ---).any? { |disq_marker| row[1] == disq_marker }
+          text_block = doc.css('pre').first
+          if text_block
+            rows = text_block.text.split("\r\n").map { |row| row.split(/[¦ (]{2,}/) }
+            options = if year >= 2001
+                        {start_number_column: 5}
+                      else
+                        {}
+                      end
+            rows.each do |row|
+              # skip header, filler rows, disqualified
+              next if row.size == 0 or
+                  STOP_WORDS.any? {|stop_word| row[0].include?(stop_word) } or
+                  %w(DNF DSQ ---).any? { |disq_marker| row[1] == disq_marker }
 
-            begin
-              csv_row = ScrapeHelpers::old_html_row_to_csv_row(row, options)
-              unless csv_row.nil?
-                csv << csv_row
+              begin
+                csv_row = ScrapeHelpers::old_html_row_to_csv_row(row, options)
+                unless csv_row.nil?
+                  csv << csv_row
+                end
+              rescue Exception => e
+                puts "Failed on #{row}"
+                raise e
               end
-            rescue Exception => e
-              puts "Failed on #{row}"
-              raise e
             end
+          else
+            puts 'No runners found for letter ' + character
           end
           progressbar.increment
         end
