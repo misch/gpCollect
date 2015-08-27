@@ -10,7 +10,12 @@ module ScrapeHelpers
   def self.old_html_row_to_csv_row(row)
     is_gp = row[4].first == 'G'
     return nil unless is_gp
-    category = row[0]
+    category = if row[0].include? '/'
+                 # for year 2000+, this column looks like this: 'GP/M30'
+                 row[0].split('/')[1]
+               else
+                 row[0]
+               end
     name_location_matches = NAME_LOCATION_REGEXP.match(row[1])
     rank_category = name_location_matches[:rank_category]
     name = name_location_matches[:name]
