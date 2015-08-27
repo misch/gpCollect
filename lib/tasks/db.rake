@@ -66,6 +66,9 @@ namespace :db do
                   "http://services.datasport.com/#{year}/lauf/gp/Alfa#{character}.htm"
                 end
           doc = Nokogiri::HTML(open(url))
+          # TODO: This does not work for very long name strings in 1999, e. g.
+          # M40        825. Baumann Matthias, Ostermundige 55 Fitness Plus Dream-Team 3  1:20.17,2 (6049)   GM/4581.
+          # (not enough spaces between ostermudige and 55)
           rows = doc.css('pre').text.split("\r\n").map { |row| row.split(/[¦ (]{2,}/) }
           options = if year >= 2001
                       {start_number_column: 5}

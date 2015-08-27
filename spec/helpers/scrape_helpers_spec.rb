@@ -37,5 +37,11 @@ RSpec.describe 'scrape_helpers' do
     expect(matches[:location]).to eq('Lengnau BE')
   end
 
+  it 'should match the variant with large string  with the name location regexp' do
+    matches = ScrapeHelpers::NAME_LOCATION_REGEXP.match '1098. Aeschlimann Toni, Ostermundige 58 Ascom 4'
+    expect(matches[:rank_category]).to eq('1098')
+    expect(matches[:name]).to eq('Aeschlimann Toni')
+    expect(matches[:location]).to eq('Ostermundige 58 Ascom 4')
+  end
+
 end
-  

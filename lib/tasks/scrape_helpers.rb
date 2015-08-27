@@ -1,6 +1,6 @@
 module ScrapeHelpers
-  NAME_LOCATION_REGEXP = /(?<rank_category>\d+). (?<name>[^,]+)(?:, (?<location>[[:alpha:]]+(?: [A-Z]{2})?))?$/
-  RUN_TYPE_OVERALL_RANK_REGEXP = /[A-Z]+\/(?<rank>\d+)./
+  NAME_LOCATION_REGEXP = /^(?<rank_category>\d+). (?<name>[^,]+)(?:, (?<location>.+))?$/
+  RUN_TYPE_OVERALL_RANK_REGEXP = /^[A-Z]+\/(?<rank>\d+).$/
 
   # One old html row looks like this:
   # ["M35", "783. Ayrom Houman", "62 Morges", "1:18.32,7", "8036)", "GM/4146."]  # Target format is
