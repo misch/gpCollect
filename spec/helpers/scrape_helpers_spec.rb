@@ -44,4 +44,8 @@ RSpec.describe 'scrape_helpers' do
     expect(matches[:location]).to eq('Ostermundige 58 Ascom 4')
   end
 
+  it 'should match with the run type regexp' do
+    matches = ScrapeHelpers::RUN_TYPE_OVERALL_RANK_REGEXP.match('GF/361.')
+    expect(matches).to_not be_nil
+  end
 end

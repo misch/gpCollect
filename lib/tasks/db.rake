@@ -53,8 +53,8 @@ namespace :db do
 
   task scrape_old_data: :environment do
     require 'open-uri'
-    COMPATIBLE_YEARS = (1999..2006)
-
+    COMPATIBLE_YEARS = (2001..2006)
+    STOP_WORDS = ['Total', 'Grand Prix', 'Kategorie', '-------', 'Stand']
     COMPATIBLE_YEARS.each do |year|
       progressbar = ProgressBar.create(title: "Scraping #{year}", total: 26,
                                        format: '%t %B %R pages/s, %a', :throttle_rate => 0.1)
@@ -77,8 +77,9 @@ namespace :db do
                     else
                       {}
                     end
-          rows.each_with_index do |row, idx|
-            next if idx == 0 or row.first.match /------------/ # skip header, filler rows
+          rows.each do |row|
+            # skip header, filler rows
+            next if row.size == 0 or STOP_WORDS.any? {|stop_word| row[0].include?(stop_word) }
 
             begin
               csv_row = ScrapeHelpers::old_html_row_to_csv_row(row, options)
