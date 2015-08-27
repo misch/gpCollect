@@ -8,7 +8,14 @@ module SeedHelpers
       nil
     else
       duration_array = duration_string.split(/[:.]/).map(&:to_f)
-      ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[2]) * 1000).to_i
+      case duration_array.size
+        when 3
+          ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[2]) * 1000).to_i
+        when 2
+          ((duration_array[0] * 60 + duration_array[1]) * 1000).to_i
+        else
+          raise 'Unexpected duration format.'
+      end
     end
   end
 
