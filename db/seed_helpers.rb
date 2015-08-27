@@ -1,21 +1,17 @@
 require 'csv'
 
 module SeedHelpers
+  DURATION_REGEXP = /(?:(?<hours>\d{2}):)?(?<minutes>\d{2})[:.](?<seconds>\d{2})[,.](?<hundred_miliseconds>\d)/
+
   # TODO: Possibly handle disqualified cases better.
   # Right now they have nil as duration (but still have an entry in the run table).
   def self.duration_string_to_milliseconds(duration_string)
     if duration_string == 'DSQ'
       nil
     else
-      duration_array = duration_string.split(/[:.]/).map(&:to_f)
-      case duration_array.size
-        when 3
-          ((duration_array[0] * 3600 + duration_array[1] * 60 + duration_array[2]) * 1000).to_i
-        when 2
-          ((duration_array[0] * 60 + duration_array[1]) * 1000).to_i
-        else
-          raise 'Unexpected duration format.'
-      end
+      matches = duration_string.match(DURATION_REGEXP)
+      ((matches[:hours] || 0).to_i * 3600 + matches[:minutes].to_i * 60 + matches[:seconds].to_i) * 1000 +
+          matches[:hundred_miliseconds].to_i * 100
     end
   end
 
