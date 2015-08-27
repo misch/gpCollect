@@ -6,6 +6,13 @@ module ScrapeHelpers
   # ["M35", "783. Ayrom Houman", "62 Morges", "1:18.32,7", "8036)", "GM/4146."]  # Target format is
   # Platz;Pl.AK;Pl.(M/W);Nr.;Name;AK;Verein/Ort;Rel *;5km;10km;Zielzeit
   def self.old_html_row_to_csv_row(row, options={})
+    if row[1].length > 40
+      # Most probably, name, birth_year and club_or_hometown are merged. Find where to split:
+      name, club_or_hometown = row[1].split(/(?<=[[[:alpha:]].-]) (?=\d{2} )/)
+      # And reinsert into row.
+      row[1] = name
+      row.insert(2, club_or_hometown)
+    end
     return nil unless is_gp?(row)
     category = if row[0].include? '/'
                  # for year 2000+, this column looks like this: 'GP/M30'
