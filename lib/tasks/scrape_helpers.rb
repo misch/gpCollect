@@ -18,6 +18,8 @@ module ScrapeHelpers
     rank_category = name_location_matches[:rank_category]
     name = name_location_matches[:name]
     # TODO: convert name to csv name format.
+    first_name, last_name = split_name(name)
+
     csv_name = nil
 
     birth_year, club_or_hometown = row[2].split(' ')
@@ -28,5 +30,20 @@ module ScrapeHelpers
 
     rank = RUN_TYPE_OVERALL_RANK_REGEXP.match(row[5])[:rank]
     [rank, rank_category, nil, start_number, csv_name, category, club_or_hometown, nil, nil, nil, time, birth_year]
+  end
+
+  # A name consists of a last_name and a first_name. Each can contain multiple words, e.g.
+  # e.g. Van Der Sluis Jan --> [Van Der Sluis, Jan]
+  def self.split_name(name)
+    splitted = name.split
+    if splitted.size == 2
+      splitted
+    else
+      if name.lower.start_with?(['van der, von der'])
+        splitted[0..1].join(' '), splitted[2..-1]
+      end
+    end
+
+
   end
 end

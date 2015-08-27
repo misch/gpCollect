@@ -30,4 +30,16 @@ RSpec.describe 'scrape_helpers' do
     expect(matches[:location]).to eq('Bern')
   end
 
+  it 'should split names with two strings into last_name and first_name' do
+    last_name, first_name = ScrapeHelpers::split_name('Meier Helen')
+    expect(first_name).to eq('Helen')
+    expect(last_name).to eq('Meier')
+  end
+
+  it 'should split names with van/von der lastname ' do
+    last_name, first_name = ScrapeHelpers::split_name('von der Heide Helen')
+    expect(first_name).to eq('Helen')
+    expect(last_name).to eq('von der Heide')
+  end
+
 end
