@@ -91,8 +91,8 @@ module SeedHelpers
           # E. g. 'Abati, Mauro (SUI)'
           m = NAME_REGEXP.match name
           if m
-            runner_hash[:last_name] = m[:last_name]
-            runner_hash[:first_name] = m[:first_name]
+            runner_hash[:last_name] = m[:last_name].gsub('0', 'o').titleize
+            runner_hash[:first_name] = m[:first_name].gsub('0', 'o').titleize
             runner_hash[:nationality] = m[:nationality]
           else
             # Known issue: in 2013 file there are some names that only consist of nationality, skip these
