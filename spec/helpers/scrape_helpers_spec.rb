@@ -84,4 +84,10 @@ RSpec.describe 'scrape_helpers' do
     expect(first_name).to eq('Pascal Janik')
     expect(last_name).to eq('Alder')
   end
+
+  it 'should split names with van der only if there is still a first name left.' do
+    last_name, first_name = ScrapeHelpers::split_name('Van Der Lee')
+    expect(first_name).to eq('Lee')
+    expect(last_name).to eq('Van Der')
+  end
 end

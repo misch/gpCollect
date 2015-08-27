@@ -66,16 +66,15 @@ module ScrapeHelpers
     if name_array.size == 2
       name_array
     else
-      case
-        when name.downcase.start_with?('van der', 'von der', 'auf der')
-          [name_array[0..2].join(' '), name_array[3..-1].join(' ')]
-        when  name.downcase.start_with?(*COMPOSED_LAST_NAME_STARTERS)
-          [name_array[0..1].join(' '), name_array[2..-1].join(' ')]
-        else
-          split_position = name_array.size/2 -1
-          [name_array[0..split_position].join(' '), name_array[split_position+1..-1].join(' ')]
-      end
-
+      split_position = case
+                         when name.downcase.start_with?('van der ', 'von der ', 'auf der ')
+                           name_array.size > 3 ? 2 : 1
+                         when name.downcase.start_with?(*COMPOSED_LAST_NAME_STARTERS)
+                           name_array.size > 2 ? 1 : 0
+                         else
+                           name_array.size/2 - 1
+                       end
+      [name_array[0..split_position].join(' '), name_array[split_position+1..-1].join(' ')]
     end
   end
 
