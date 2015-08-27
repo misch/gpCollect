@@ -31,6 +31,8 @@ module ScrapeHelpers
     name_location_matches = NAME_LOCATION_REGEXP.match(row[1])
     rank_category = name_location_matches[:rank_category]
     name = name_location_matches[:name]
+    # If no name is available, only 'Startnummer' is given. We don't scrape these.
+    return nil if name.include? 'Startnummer'
 
     # convert name to csv name format.
     csv_name = split_name(name).join(', ')
