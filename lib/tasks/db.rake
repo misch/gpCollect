@@ -90,8 +90,6 @@ namespace :db do
                 raise e
               end
             end
-          else
-            puts 'No runners found for letter ' + character
           end
           progressbar.increment
         end
