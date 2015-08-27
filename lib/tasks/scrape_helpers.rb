@@ -5,7 +5,7 @@ module ScrapeHelpers
   # One old html row looks like this (for 1999):
   # ["M35", "783. Ayrom Houman", "62 Morges", "1:18.32,7", "8036)", "GM/4146."]
   # For 2000:
-  # ["GP/W20", "92. Allenbach Katharina", "71 Ried", "Frutigen)", "1:18.24,0", "6013)", "GF/361."]
+  # ["GP/W20", "92. Allenbach Katharina", "71 Ried (Frutigen)", "1:18.24,0", "6013)", "GF/361."]
   # # Target format is
   # Platz;Pl.AK;Pl.(M/W);Nr.;Name;AK;Verein/Ort;Rel *;5km;10km;Zielzeit
   def self.old_html_row_to_csv_row(row, options={})
@@ -17,7 +17,8 @@ module ScrapeHelpers
       row.insert(2, club_or_hometown)
     end
     unless row[3].match /\.\d{2},\d$/
-      # This should be duration, we split location by accident -> remove the additional column and merge with previous.
+      # This should be a duration.
+      # If it's not, we split location by accident -> remove the additional column and merge with previous.
       row[2] << '(' + row.delete_at(3)
     end
     return nil unless is_gp?(row)
