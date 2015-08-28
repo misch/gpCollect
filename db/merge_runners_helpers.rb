@@ -24,8 +24,8 @@ module MergeRunnersHelpers
     (string.scan(/[[:alpha:]]/) - string.scan(/\w/)).size
   end
 
-  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca)
-  FEMALE_FIRST_NAMES = %w(Denise Tabea)
+  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice)
+  FEMALE_FIRST_NAMES = %w(Denise Tabea Capucine Lucienne)
   POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
@@ -37,8 +37,6 @@ module MergeRunnersHelpers
       if entries.size != 2
         raise "More than two possibilities, dont know what to do for #{entries}"
       end
-      # These are differentiated by age, go to next.
-      next if (entries.first.birth_date - entries.second.birth_date).abs > 10 * 365
       first_name = entries.first.first_name
       correct_entry, wrong_entry = if MALE_FIRST_NAMES.include?(first_name)
                                      # M comes first, so ordering by sex will return it first.
@@ -53,10 +51,18 @@ module MergeRunnersHelpers
     end
     puts "Merged #{merged_runners} entries based on sex."
 
+    find_runners_only_differing_in(:nationality).each do |entries|
+      # Use most recently known nationality for runner
+      correct_entry = entries.max_by { |entry| entry.run_days.max_by(&:date) }
+      wrong_entries = entries.reject { |entry| entry == correct_entry }
+      wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
+      merged_runners += wrong_entries.size
+    end
+    puts "Merged #{merged_runners} entries based nationality"
+
     POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES.each do |attr|
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(#{attr}) as unaccented"], ['unaccented']).each_with_index do |entries|
-
         # The correct entry is the one with more accents (probably?).
         correct_entry = entries.max_by { |entry| count_accents(entry[attr]) }
         wrong_entries = entries.reject { |entry| entry == correct_entry }
