@@ -40,7 +40,9 @@ module ScrapeHelpers
     birth_year, club_or_hometown = row[2].split(' ')
     club_or_hometown ||= name_location_matches[:location]
 
-    time = row[3]
+    # Convert from 59.09,9 to 59:09.9
+    time = row[3].gsub('.', ':').gsub(',', '.')
+
     start_number = row[options.fetch(:start_number_column, 4)].gsub(')', '')
 
     if row.size >= 10

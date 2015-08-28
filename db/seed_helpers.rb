@@ -1,7 +1,7 @@
 require 'csv'
 
 module SeedHelpers
-  DURATION_REGEXP = /(?:(?<hours>\d{1,2}):)?(?<minutes>\d{2})[:.](?<seconds>\d{2})(?:[,.](?<hundred_miliseconds>\d))?/
+  DURATION_REGEXP = /(?:(?<hours>\d{1,2}):)?(?<minutes>\d{2}):(?<seconds>\d{2})(?:\.(?<hundred_miliseconds>\d))?/
 
   # TODO: Possibly handle disqualified cases better.
   # Right now they have nil as duration (but still have an entry in the run table).

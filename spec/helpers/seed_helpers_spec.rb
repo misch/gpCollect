@@ -43,11 +43,6 @@ RSpec.describe 'seed_helpers' do
     expect(matches).to be_falsey
   end
 
-  it 'should turn a duration with comma and all values correctly to miliseconds' do
-    duration = SeedHelpers::duration_string_to_milliseconds '01:01:01,2'
-    expect(duration).to be((1 * 3600 + 1 * 60 + 1) * 1000 + 2 * 100)
-  end
-
   it 'should turn a duration with dot and all values correctly to miliseconds' do
     duration = SeedHelpers::duration_string_to_milliseconds '01:01:01.2'
     expect(duration).to be((1 * 3600 + 1 * 60 + 1) * 1000 + 2 * 100)
@@ -61,11 +56,6 @@ RSpec.describe 'seed_helpers' do
   it 'should turn a duration without hours correctly to miliseconds' do
     duration = SeedHelpers::duration_string_to_milliseconds '50:00,0'
     expect(duration).to be(50 * 60 * 1000)
-  end
-
-  it 'should turn a duration only one hour digit correctly to miliseconds' do
-    duration = SeedHelpers::duration_string_to_milliseconds '1:41.39,7'
-    expect(duration).to be(((1 * 3600 + 41 * 60 + 39.7) * 1000).to_i)
   end
 
   it 'should turn a duration without hundreds miliseconds correctly to miliseconds' do
