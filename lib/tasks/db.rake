@@ -47,8 +47,6 @@ namespace :db do
       end
       progressbar.finish
     end
-    # Parses very old years
-    pp doc.css('pre').text.split("\r\n").map { |row| row.split(/ {2,}/) };
   end
 
   task scrape_old_data: :environment do
