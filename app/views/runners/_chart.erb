@@ -40,6 +40,12 @@
                     data: [<%= runner.runs.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
                 },
                 <% end %>
+                <% if runners.size == 1 %>
+                {
+                    name: "Category mean",
+                    data: [<%= runners.first.runs.map { |r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.mean_duration_for_run_day_category}]" }.join(',') %>]
+                }
+                <% end %>
             ]
 
         });
