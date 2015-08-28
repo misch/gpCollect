@@ -8,7 +8,17 @@
                 text: null
             },
             xAxis: {
-                type: "datetime"
+                type: "datetime",
+                tickPositioner: function() {
+                    var ticks = [<%= RunDay.all.map { |run_day| ruby_to_javascript_date(run_day.date)}.join(',') %>];
+                    //dates.info defines what to show in labels
+                    //apparently dateTimeLabelFormats is always ignored when specifying tickPosistioner
+                    ticks.info = {
+                        unitName: "year", //unitName: "day",
+                        higherRanks: {} // Omitting this would break things
+                    };
+                    return ticks;
+                }
             },
             yAxis: {
                 type: 'datetime', // y-axis will be in milliseconds
@@ -21,9 +31,7 @@
                     month: '%H:%M:%S',
                     year: '%H:%M:%S'
                 },
-                yDateFormat: '%H:%M:%S',
-                shared: true,
-                yType: 'datetime'
+                shared: true
             },
             tooltip: {
                 useHTML: true,

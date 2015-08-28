@@ -26,6 +26,5 @@ $ ->
         runner_array = []
       runner_array.push(id)
       Cookies.set('remembered_runners', runner_array)
-      console.log(runner_array)
     )
   )
