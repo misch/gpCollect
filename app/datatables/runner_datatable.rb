@@ -26,7 +26,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           record.runs_count,
           record.fastest_run.decorate.duration_formatted,
           link_to(fa_icon('eye lg'), runner_path(record)) + ' ' +
-              link_to(fa_icon('star lg'), remember_runner_path(record), remote: true)
+              link_to(fa_icon('star lg'), '#', data: { remember_runner: record.id } )
       ]
     end
   end

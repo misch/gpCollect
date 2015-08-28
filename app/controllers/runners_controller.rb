@@ -72,7 +72,7 @@ class RunnersController < ApplicationController
   end
 
   def show_remembered
-    @runners = Runner.find(session[:runner_ids])
+    @runners = Runner.find(JSON.parse(cookies[:remembered_runners]))
   end
 
   private
