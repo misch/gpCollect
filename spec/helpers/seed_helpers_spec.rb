@@ -67,4 +67,10 @@ RSpec.describe 'seed_helpers' do
     duration = SeedHelpers::duration_string_to_milliseconds '1:41.39,7'
     expect(duration).to be(((1 * 3600 + 41 * 60 + 39.7) * 1000).to_i)
   end
+
+  it 'should turn a duration without hundreds miliseconds correctly to miliseconds' do
+    duration = SeedHelpers::duration_string_to_milliseconds '1:14:24'
+    expect(duration).to be(((1 * 3600 + 14 * 60 + 24) * 1000).to_i)
+  end
+
 end

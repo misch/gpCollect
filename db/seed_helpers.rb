@@ -1,7 +1,7 @@
 require 'csv'
 
 module SeedHelpers
-  DURATION_REGEXP = /(?:(?<hours>\d{1,2}):)?(?<minutes>\d{2})[:.](?<seconds>\d{2})[,.](?<hundred_miliseconds>\d)/
+  DURATION_REGEXP = /(?:(?<hours>\d{1,2}):)?(?<minutes>\d{2})[:.](?<seconds>\d{2})(?:[,.](?<hundred_miliseconds>\d))?/
 
   # TODO: Possibly handle disqualified cases better.
   # Right now they have nil as duration (but still have an entry in the run table).
@@ -11,7 +11,7 @@ module SeedHelpers
     else
       matches = duration_string.match(DURATION_REGEXP)
       ((matches[:hours] || 0).to_i * 3600 + matches[:minutes].to_i * 60 + matches[:seconds].to_i) * 1000 +
-          matches[:hundred_miliseconds].to_i * 100
+          (matches[:hundred_miliseconds] || 0).to_i * 100
     end
   end
 
@@ -69,10 +69,12 @@ module SeedHelpers
   # * run_day: The run day the runs to be seeded belong to
   #
   # Optionally taking the following keys:
-  # * shift: Additional shift of read out columns, if format does not match exactly.
+  # * shift: Additional shift of ALL read out columns, if format does not match exactly.
+  # * duration_shift: additional shift for duration column.
   def self.seed_runs_file(options)
     file = options.fetch(:file)
     shift = options.fetch(:shift, 0)
+    duration_shift = options.fetch(:duration_shift, 0)
     puts "Seeding #{file} "
     progressbar = ProgressBar.create(total: `wc -l #{file}`.to_i, format: '%B %R runs/s, %a',
                                      :throttle_rate => 0.1)
@@ -83,7 +85,7 @@ module SeedHelpers
         name = line[4 + shift]
         category_string = line[5 + shift]
         runner_hash[:club_or_hometown] = line[6 + shift]
-        duration_string = line[10 + shift]
+        duration_string = line[10 + shift + duration_shift]
 
         # Don't create a runner/run if there is no category or duration associated.
         next if category_string.blank? or duration_string.blank?

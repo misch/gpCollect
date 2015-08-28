@@ -58,7 +58,7 @@ namespace :db do
                                        format: '%t %B %R pages/s, %a', :throttle_rate => 0.1)
       CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
         # header lined
-        csv << 'Platz;Pl.AK;Startnr.;Name;AK;Verein/Stadt;5 km;10 km;Ziel;Jahrgang'.split(';')
+        csv << 'Platz;Pl.AK;Pl.(M/W);Nr.;Name;AK;Verein/Ort;Rel *;5km;10km;Zielzeit;Jahrgang'.split(';')
         ('A'..'Z').each do |character|
           url = if year == 2000
                   "http://services.datasport.com/#{year}/lauf/gp/Rangliste/ALFA#{character}.HTM"
