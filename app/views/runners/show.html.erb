@@ -1,31 +1,15 @@
 <p id="notice"><%= notice %></p>
-<h1>Runner</h1>
-<p>
-  <strong>First name:</strong>
-  <%= @runner.first_name %>
-</p>
+<h1><%= @runner.first_name %> <%= @runner.last_name %></h1>
+<dl class="dl-horizontal">
+  <dt><%= Runner.human_attribute_name :birth_date %></dt>
+  <dd><%= @runner.birth_date %></dd>
+  <dt><%= Runner.human_attribute_name :sex %></dt>
+  <dd><%= @runner.sex %></dd>
+  <dt><%= Runner.human_attribute_name :club_or_hometown %></dt>
+  <dd><%= @runner.club_or_hometown %></dd>
+</dl>
 
-<p>
-  <strong>Last name:</strong>
-  <%= @runner.last_name %>
-</p>
-
-<p>
-  <strong>Birth date:</strong>
-  <%= @runner.birth_date %>
-</p>
-
-<p>
-  <strong>Sex:</strong>
-  <%= @runner.sex %>
-</p>
-
-<p>
-  <strong>Club or Hometown:</strong>
-  <%= @runner.club_or_hometown %>
-</p>
-
-<h1>Runs</h1>
+<h2>Runs</h2>
 
 <% if @runner.runs.empty? %>
     No runs available
@@ -33,13 +17,15 @@
     <%= render 'chart', runners: [@runner] %>
     <table class="table table-striped">
       <thead>
-      <th>Day</th>
-      <th>Category</th>
-      <th>Duration</th>
+      <th><%= Run.human_attribute_name :run_date %></th>
+      <th><%= RunDay.human_attribute_name :weather %></th>
+      <th><%= Run.human_attribute_name :category %></th>
+      <th><%= Run.human_attribute_name :duration %></th>
       </thead>
       <% @runner.runs.each do |run| %>
           <tr>
             <td><%= I18n.l run.run_day.date %></td>
+            <td><%= run.run_day.weather %></td>
             <td><%= run.category.name %></td>
             <td><%= run.duration_formatted %></td>
           </tr>
