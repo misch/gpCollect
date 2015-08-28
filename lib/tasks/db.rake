@@ -34,7 +34,7 @@ namespace :db do
               td.css('span')[0][:title]
             else
               td.content
-            end.gsub('»', '').strip
+            end.gsub('»', '').gsub(',  ', ', ').strip # Further clean string
           end
           }
           rows.each { |row| csv << row }
