@@ -28,3 +28,7 @@ $ ->
       Cookies.set('remembered_runners', runner_array)
     )
   )
+  $('a[data-forget-runners]').on('click', (e) ->
+    e.preventDefault()
+    Cookies.remove('remembered_runners')
+  )

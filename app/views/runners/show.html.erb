@@ -2,7 +2,7 @@
 <h1><%= @runner.first_name %> <%= @runner.last_name %></h1>
 <dl class="dl-horizontal">
   <dt><%= Runner.human_attribute_name :birth_date %></dt>
-  <dd><%= @runner.birth_date %></dd>
+  <dd><%= I18n.l @runner.birth_date %></dd>
   <dt><%= Runner.human_attribute_name :sex %></dt>
   <dd><%= @runner.sex %></dd>
   <dt><%= Runner.human_attribute_name :club_or_hometown %></dt>

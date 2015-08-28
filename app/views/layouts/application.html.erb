@@ -23,6 +23,7 @@
       <ul class="nav navbar-nav">
         <li><%= link_to 'Runners', runners_path %></li>
         <li><%= link_to 'Remembered Runners', show_remembered_runners_path %></li>
+        <li><%= link_to 'Forget Runners', '#', data: { forget_runners: true }  %></li>
         <li><%= link_to 'Runs', runs_path %></li>
         <li><%= link_to 'Categories', categories_path %></li>
       </ul>
