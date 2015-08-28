@@ -100,6 +100,8 @@ module SeedHelpers
             # Known issue: in 2013 file there are some names that only consist of nationality, skip these
             if name.match /\([A-Z]{3}\)/
               next
+            elsif name.match /\([0-9]{1,3}\)/ #Known issue: Nationality consist of numbers -> next
+              next
             else
               raise 'Could not parse name: ' + name
             end
