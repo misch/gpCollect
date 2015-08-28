@@ -59,6 +59,8 @@ namespace :db do
       progressbar = ProgressBar.create(title: "Scraping #{year}", total: 26,
                                        format: '%t %B %R pages/s, %a', :throttle_rate => 0.1)
       CSV.open("db/data/gp_bern_10m_#{year}.csv", 'wb', col_sep: ';') do |csv|
+        # header lined
+        csv << 'Platz;Pl.AK;Startnr.;Name;AK;Verein/Stadt;5 km;10 km;Ziel;Jahrgang'.split(';')
         ('A'..'Z').each do |character|
           url = if year == 2000
                   "http://services.datasport.com/#{year}/lauf/gp/Rangliste/ALFA#{character}.HTM"
