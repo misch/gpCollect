@@ -4,7 +4,7 @@ class RunsController < ApplicationController
   # GET /runs
   # GET /runs.json
   def index
-    @runs = Run.all.includes(:category, :runner).order(duration: :asc).page(params[:page]).decorate
+    @runs = Run.all.includes(:category, :runner, :run_day).order(duration: :asc).page(params[:page]).decorate
   end
 
   # GET /runs/1
