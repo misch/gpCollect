@@ -7,14 +7,20 @@ module MergeRunnersHelpers
   end
 
   def self.find_runners_only_differing_in(attr, additional_attributes_select=[], additional_attributes_group=[])
-    identifying_runner_attributes_select = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, '(current_date - birth_date)/365/10 AS age']
-    identifying_runner_attributes_group = [:first_name, :last_name, :nationality, :club_or_hometown, :sex, 'age']
-    r = Runner.select(identifying_runner_attributes_select - [attr] + additional_attributes_select + ['array_agg(id) AS ids'])
-            .group(identifying_runner_attributes_group - [attr] + additional_attributes_group).having('count(*) > 1')
+    identifying_runner_attributes_select = [:first_name, :last_name, :nationality, :club_or_hometown, :sex]
+    identifying_runner_attributes_group = [:first_name, :last_name, :nationality, :club_or_hometown, :sex]
+    r = Runner.select(identifying_runner_attributes_select - [attr].flatten + additional_attributes_select + ['array_agg(id) AS ids'])
+            .group(identifying_runner_attributes_group - [attr].flatten + additional_attributes_group).having('count(*) > 1')
     # Each merge candidate consists of multiple runners, retrieve these runners from database here.
     merge_candidates = r.map { |i| Runner.includes(:run_days).find(i['ids']) }
     # Only select the runners as merge candidates that differ in the queried attribute.
+
+    # TODO: possibly remove this.
     merge_candidates.select! {|i| i.first[attr] != i.second[attr]}
+
+    # TODO: Remove candidates that have a too large discrepancy in age.
+    # merge_candidates.select! {|i| i.birth_date - }
+
     # Only select runners for merging that have no overlapping run days.
     merge_candidates.select {|i| i.all? {|fixed_runner| (i - [fixed_runner]).all? { |other_runner| (fixed_runner.run_days & other_runner.run_days).empty? }}}
   end
@@ -24,8 +30,8 @@ module MergeRunnersHelpers
     (string.scan(/[[:alpha:]]/) - string.scan(/\w/)).size
   end
 
-  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice)
-  FEMALE_FIRST_NAMES = %w(Denise Tabea Capucine Lucienne)
+  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice Eric)
+  FEMALE_FIRST_NAMES = %w(Denise Tabea Capucine Lucienne Carole Dominique)
   POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
@@ -52,8 +58,8 @@ module MergeRunnersHelpers
     puts "Merged #{merged_runners} entries based on sex."
 
     find_runners_only_differing_in(:nationality).each do |entries|
-      # Use most recently known nationality for runner
-      correct_entry = entries.max_by { |entry| entry.run_days.max_by(&:date) }
+      # Use most recently known nationality for runner that has a non-blank nationality.
+      correct_entry = entries.reject { |entry| entry.nationality.blank? }.max_by { |entry| entry.run_days.max_by(&:date) }
       wrong_entries = entries.reject { |entry| entry == correct_entry }
       wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
       merged_runners += wrong_entries.size
