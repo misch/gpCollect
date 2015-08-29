@@ -17,17 +17,36 @@ $ ->
   })
 
   dt.on('draw', ->
-    console.log('draw')
     $('a[data-remember-runner]').on('click', (e) ->
       e.preventDefault()
       id = $(this).data("remember-runner")
-      runner_array = Cookies.getJSON('remembered_runners')
+      runner_array = get_remembered_runners()
       if (!runner_array?)
         runner_array = []
-      runner_array.push(id)
+      index_of_id = runner_array.indexOf(id)
+      if index_of_id != -1
+        runner_array.splice(index_of_id, 1) # Removes id from array.
+      else
+        runner_array.push(id)
+      update_remember_runner_icon(id, runner_array, $(this).find('i'))
       Cookies.set('remembered_runners', runner_array)
     )
+    $('a[data-remember-runner]').each ->
+      id = $(this).data("remember-runner")
+      runner_array = get_remembered_runners()
+      update_remember_runner_icon(id, runner_array, $(this).find('i'))
   )
+
+  get_remembered_runners = ->
+    Cookies.getJSON('remembered_runners')
+
+  update_remember_runner_icon = (id, runner_array, icon) ->
+    if id in runner_array
+      icon.removeClass('fa-star')
+      icon.addClass('fa-star-o')
+    else
+      icon.removeClass('fa-star-o')
+      icon.addClass('fa-star')
 
   # Only search after a minimum of 3 characters were entered
   $(".dataTables_filter input")
