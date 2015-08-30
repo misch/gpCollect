@@ -21,8 +21,6 @@ $ ->
       e.preventDefault()
       id = $(this).data("remember-runner")
       runner_array = get_remembered_runners()
-      if (!runner_array?)
-        runner_array = []
       index_of_id = runner_array.indexOf(id)
       if index_of_id != -1
         runner_array.splice(index_of_id, 1) # Removes id from array.
@@ -38,7 +36,7 @@ $ ->
   )
 
   get_remembered_runners = ->
-    Cookies.getJSON('remembered_runners')
+    Cookies.getJSON('remembered_runners') || []
 
   update_remember_runner_icon = (id, runner_array, icon) ->
     if id in runner_array
