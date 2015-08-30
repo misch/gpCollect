@@ -13,6 +13,17 @@ class RunnerDatatable < AjaxDatatablesRails::Base
     @searchable_columns ||= ['Runner.first_name', 'Runner.last_name', 'Runner.club_or_hometown']
   end
 
+  def as_json(options = {})
+    filtered_data = data
+    total_count = Rails.cache.fetch('raw_count') { get_raw_records.count(:all) }
+    {
+        :draw => params[:draw].to_i,
+        :recordsTotal =>  total_count,
+        :recordsFiltered => records.first['count'],
+        :data => filtered_data
+    }
+  end
+
   private
 
   def data
@@ -26,7 +37,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           record.runs_count,
           record.fastest_run.decorate.duration_formatted,
           link_to(fa_icon('eye lg'), runner_path(record)) + ' ' +
-              link_to(content_tag(:i, '', class: 'fa fa-lg'), '#', data: { remember_runner: record.id } )
+              link_to(content_tag(:i, '', class: 'fa fa-lg'), '#', data: {remember_runner: record.id})
       ]
     end
   end
@@ -51,7 +62,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           unaccented_column.matches(::Arel::Nodes::NamedFunction.new('f_unaccent', [::Arel::Nodes::build_quoted(term)]))
         end.reduce(:or)
       end.reduce(:and)
-      records.where(where_clause)
+      records.select('*, count(*) OVER() as count').where(where_clause)
     else
       records
     end
