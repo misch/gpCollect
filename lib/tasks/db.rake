@@ -97,4 +97,9 @@ namespace :db do
       end
     end
   end
+
+  task merge_runners: :environment do
+    require_relative '../../db/merge_runners_helpers'
+    MergeRunnersHelpers::merge_duplicates
+  end
 end
