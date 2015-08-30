@@ -57,6 +57,11 @@ gem 'mechanize'
 
 gem 'thin'
 
+# For performance evaluation:
+gem 'rack-mini-profiler'
+gem 'flamegraph'
+gem 'stackprof'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
