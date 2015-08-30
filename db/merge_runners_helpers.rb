@@ -87,20 +87,14 @@ module MergeRunnersHelpers
     POSSIBLY_WRONGLY_CASED_ATTRIBUTES.each do |attr|
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(lower(#{attr})) as low"], ['low']).each do |entries|
-        if entries.size != 2
-          raise "More than two possibilities, dont know what to do for #{entries}"
-        end
         # We take the one with more lowercase characters as he correct one. E. g. for
         # Reichenbach I. K.
         # Reichenbach i. K.
         # the version at the bottom is preferred.
-        correct_entry, wrong_entry = if entries.first[attr].scan(/[[:lower:]]/).size > entries.second[attr].scan(/[[:lower:]]/).size
-                                       [entries.first, entries.second]
-                                     else
-                                       [entries.second, entries.first]
-                                     end
-        merge_runners(correct_entry, wrong_entry)
-        merged_runners += 1
+        correct_entry = entries.max_by {|c| c[attr].scan(/[[:lower:]]/).size}
+        wrong_entries = entries.reject { |entry| entry == correct_entry }
+        wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
+        merged_runners += wrong_entries.size
       end
       puts "Merged #{merged_runners} entries based on case of #{attr}."
     end
