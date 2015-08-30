@@ -42,11 +42,13 @@
                 }
             },
             series: [
-                <% runners.each do |runner| %>
-                {
-                    name: "<%= runner.first_name %> <%= runner.last_name %>",
-                    data: [<%= runner.runs.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
-                },
+                <% if runners.size > 1 %>
+                    <% runners.each do |runner| %>
+                    {
+                        name: "<%= runner.first_name %> <%= runner.last_name %>",
+                        data: [<%= runner.runs.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
+                    },
+                    <% end %>
                 <% end %>
                 <% if runners.size == 1 %>
                 {
