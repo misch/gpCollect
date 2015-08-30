@@ -58,6 +58,7 @@ module MergeRunnersHelpers
     end
     puts "Merged #{merged_runners} entries based on sex."
 
+    merged_runners = 0
     find_runners_only_differing_in(:nationality).each do |entries|
       # Use most recently known nationality for runner that has a non-blank nationality.
       correct_entry = entries.reject { |entry| entry.nationality.blank? }.max_by { |entry| entry.run_days.max_by(&:date) }
