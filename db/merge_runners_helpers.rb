@@ -125,9 +125,9 @@ module MergeRunnersHelpers
 
     POSSIBLY_CONTAINING_UMLAUTE_ATTRIBUTES.each do |attr|
       merged_runners = 0
-      find_runners_only_differing_in(attr, ["replace#{attr}, 'ae', 'ä' as with_umlaut"], ['with_umlaut']).each do |entries|
+      find_runners_only_differing_in(attr, ["replace(replace(replace(#{attr}, 'ae', 'ä'), 'oe', 'ö'), 'ue', 'ü') as with_umlaut"], ['with_umlaut']).each do |entries|
         # assume the correct entry is the one with more Umlaute, as there seemed to be no unicode support in earlier data.
-        correct_entry = entries.max_by {|entry| entry.count "äöü"}
+        correct_entry = entries.max_by {|entry| entry[attr].count "äöü"}
         wrong_entries = entries.reject { |entry| entry == correct_entry }
         wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
         merged_runners += wrong_entries.size
