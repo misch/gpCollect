@@ -30,11 +30,12 @@ module MergeRunnersHelpers
     (string.scan(/[[:alpha:]]/) - string.scan(/\w/)).size
   end
 
-  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice Eric)
+  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice Eric Yannick)
   FEMALE_FIRST_NAMES = %w(Denise Tabea Capucine Lucienne Carole Dominique)
   POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
   POSSIBLY_WRONGLY_SPACED_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
+  POSSIBLY_CONTAINING_UMLAUTE_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown]
 
   def self.merge_duplicates
     merged_runners = 0
@@ -57,6 +58,7 @@ module MergeRunnersHelpers
     end
     puts "Merged #{merged_runners} entries based on sex."
 
+    merged_runners = 0
     find_runners_only_differing_in(:nationality).each do |entries|
       # Use most recently known nationality for runner that has a non-blank nationality.
       correct_entry = entries.reject { |entry| entry.nationality.blank? }.max_by { |entry| entry.run_days.max_by(&:date) }
@@ -85,20 +87,14 @@ module MergeRunnersHelpers
     POSSIBLY_WRONGLY_CASED_ATTRIBUTES.each do |attr|
       merged_runners = 0
       find_runners_only_differing_in(attr, ["f_unaccent(lower(#{attr})) as low"], ['low']).each do |entries|
-        if entries.size != 2
-          raise "More than two possibilities, dont know what to do for #{entries}"
-        end
         # We take the one with more lowercase characters as he correct one. E. g. for
         # Reichenbach I. K.
         # Reichenbach i. K.
         # the version at the bottom is preferred.
-        correct_entry, wrong_entry = if entries.first[attr].scan(/[[:lower:]]/).size > entries.second[attr].scan(/[[:lower:]]/).size
-                                       [entries.first, entries.second]
-                                     else
-                                       [entries.second, entries.first]
-                                     end
-        merge_runners(correct_entry, wrong_entry)
-        merged_runners += 1
+        correct_entry = entries.max_by {|c| c[attr].scan(/[[:lower:]]/).size}
+        wrong_entries = entries.reject { |entry| entry == correct_entry }
+        wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
+        merged_runners += wrong_entries.size
       end
       puts "Merged #{merged_runners} entries based on case of #{attr}."
     end
@@ -119,6 +115,19 @@ module MergeRunnersHelpers
         merged_runners += 1
       end
       puts "Merged #{merged_runners} entries based on spaces of #{attr}."
+    end
+
+    POSSIBLY_CONTAINING_UMLAUTE_ATTRIBUTES.each do |attr|
+      merged_runners = 0
+      find_runners_only_differing_in(attr, ["replace(replace(replace(lower(#{attr}), 'ae', 'ä'), 'oe', 'ö'), 'ue', 'ü') as with_umlaut"],
+                                     ['with_umlaut']).each do |entries|
+        # assume the correct entry is the one with more Umlaute, as there seemed to be no unicode support in earlier data.
+        correct_entry = entries.max_by {|entry| entry[attr].count('äüöÄÜÖ')}
+        wrong_entries = entries.reject { |entry| entry == correct_entry }
+        wrong_entries.each { |entry| merge_runners(correct_entry, entry) }
+        merged_runners += wrong_entries.size
+      end
+      puts "Merged #{merged_runners} entries based on Umlaute in #{attr}"
     end
 
     # TODO: Try to fix club_or_hometown duplicates, e. g.
