@@ -19,7 +19,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
     {
         :draw => params[:draw].to_i,
         :recordsTotal =>  total_count,
-        :recordsFiltered => records.first['count'] || total_count,
+        :recordsFiltered => records.first['filtered_count'] || total_count,
         :data => filtered_data
     }
   end
@@ -62,7 +62,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           unaccented_column.matches(::Arel::Nodes::NamedFunction.new('f_unaccent', [::Arel::Nodes::build_quoted(term)]))
         end.reduce(:or)
       end.reduce(:and)
-      records.select('*, count(*) OVER() as count').where(where_clause)
+      records.select('*, count(*) OVER() as filtered_count').where(where_clause)
     else
       records
     end
