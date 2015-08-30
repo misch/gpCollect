@@ -19,7 +19,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
     {
         :draw => params[:draw].to_i,
         :recordsTotal =>  total_count,
-        :recordsFiltered => records.first['count'],
+        :recordsFiltered => records.first['count'] || total_count,
         :data => filtered_data
     }
   end
