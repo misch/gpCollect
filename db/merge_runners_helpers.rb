@@ -31,6 +31,7 @@ module MergeRunnersHelpers
   end
 
   MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice Eric)
+  MALE_FIRST_NAMES = %w(Jannick Candido Loïc Patrick Raffael Kazim Luca Manuel Patrice Eric Yannick)
   FEMALE_FIRST_NAMES = %w(Denise Tabea Capucine Lucienne Carole Dominique)
   POSSIBLY_WRONGLY_ACCENTED_ATTRIBUTES = [:first_name, :last_name]
   POSSIBLY_WRONGLY_CASED_ATTRIBUTES = [:club_or_hometown]
