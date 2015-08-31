@@ -65,11 +65,11 @@ namespace :deploy do
 
   after :finished, :compile_assets_and_restart do
     on roles(:all) do
-      invoke 'deploy:compile_assets_locally'
-      invoke 'service:thin:restart'
       within release_path do
         execute :rake, 'tmp:clear'
       end
+      invoke 'deploy:compile_assets_locally'
+      invoke 'service:thin:restart'
     end
   end
 end
