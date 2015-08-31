@@ -62,7 +62,7 @@ namespace :deploy do
       'deploy:compile_assets'
       'service:thin:restart'
       within release_path do
-        execute :rake, 'cache:clear'
+        execute :rake, 'tmp:clear'
       end
     end
   end
