@@ -60,3 +60,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 db/data
+.env
+.rspec
