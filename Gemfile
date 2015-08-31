@@ -62,6 +62,13 @@ gem 'rack-mini-profiler'
 gem 'flamegraph'
 gem 'stackprof'
 
+group :development do
+  # For easier deployment
+  gem 'capistrano-rails'
+  gem 'capistrano-service'
+  gem 'rvm1-capistrano3', require: false
+end
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
