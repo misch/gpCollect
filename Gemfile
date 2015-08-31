@@ -36,6 +36,8 @@ gem 'font-awesome-rails'
 
 # Twitter bootstrap
 gem 'bootstrap-sass'
+# Helpers for bootstrap
+gem 'bh'
 
 # For pagination
 gem 'kaminari'
