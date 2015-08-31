@@ -53,6 +53,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
   # words (in some column) are returned.
   def filter_records(records)
     if params[:search].present? and not params[:search][:value].blank?
+      Rails.logger.debug(params[:search][:value])
       search_for = params[:search][:value].split(' ')
       where_clause = search_for.map do |unescaped_term|
         term = "%#{sanitize_sql_like(unescaped_term)}%"
