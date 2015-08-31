@@ -38,6 +38,12 @@ set :linked_dirs, fetch(:linked_dirs, []).push('public/assets')
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+ConditionalDeploy.configure(self) do |conditional|
+  conditional.register :skip_migrations, :none_match => ['db/migrate'] do |c|
+    c.skip_task 'deploy:migrate'
+  end
+end
+
 namespace :deploy do
   # Clear existing task so we can replace it rather than "add" to it.
   #Rake::Task["deploy:compile_assets"].clear
@@ -59,8 +65,8 @@ namespace :deploy do
 
   after :finished, :compile_assets_and_restart do
     on roles(:all) do
-      deploy.compile_assets_locally
-      service.thin.restart
+      invoke 'deploy:compile_assets_locally'
+      invoke 'service:thin:restart'
       within release_path do
         execute :rake, 'tmp:clear'
       end

@@ -61,6 +61,7 @@ group :development do
   gem 'capistrano-rails'
   gem 'capistrano-service'
   gem 'rvm1-capistrano3', require: false
+  gem 'capistrano-conditional', :require => false
 end
 
 group :development, :test do
