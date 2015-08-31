@@ -33,11 +33,6 @@ gem 'highcharts-rails'
 # Awesome icons
 gem 'font-awesome-rails'
 
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.0'
-# bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
-
 # Twitter bootstrap
 gem 'bootstrap-sass'
 
@@ -47,12 +42,6 @@ gem 'bootstrap-kaminari-views'
 
 # Decorators
 gem 'draper'
-
-# For tracking progress when seeding
-gem 'ruby-progressbar'
-
-# For heroku configuration
-gem 'rails_12factor', group: :production
 
 # For scraping web.
 gem 'mechanize'
@@ -65,6 +54,9 @@ gem 'flamegraph'
 gem 'stackprof'
 
 group :development do
+  # For tracking progress when seeding
+  gem 'ruby-progressbar'
+
   # For easier deployment
   gem 'capistrano-rails'
   gem 'capistrano-service'
