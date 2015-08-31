@@ -17,7 +17,7 @@
     <% @runs.each do |run| %>
       <tr>
         <td class="col-xs-1"><%= run.duration_formatted %></td>
-        <td><%= link_to run.runner_name, run.runner %></td>
+        <td><%= link_to run.runner.name, run.runner %></td>
         <td><%= run.category.name %></td>
         <td><%= run.run_day.date.year %></td>
         <td><%= link_to 'Show', run %></td>

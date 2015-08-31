@@ -7,4 +7,8 @@ class Runner < ActiveRecord::Base
   def fastest_run
     runs.min_by { |i| i.duration || 0 }
   end
+
+  def mean_run_duration
+    runs.average(:duration) || 0
+  end
 end
