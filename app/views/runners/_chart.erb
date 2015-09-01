@@ -10,7 +10,7 @@
             xAxis: {
                 type: "datetime",
                 tickPositioner: function() {
-                    var ticks = [<%= RunDay.all.map { |run_day| ruby_to_javascript_date(run_day.date)}.join(',') %>];
+                    var ticks = [<%= RunDay.all.pluck(:date).map { |run_day_date| ruby_to_javascript_date(run_day_date)}.join(',') %>];
                     //dates.info defines what to show in labels
                     //apparently dateTimeLabelFormats is always ignored when specifying tickPosistioner
                     ticks.info = {
@@ -51,7 +51,7 @@
                 <% if runners.size == 1 %>
                 {
                     name: "Category mean",
-                    data: [<%= runners.first.runs.map { |r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.mean_duration_for_run_day_category}]" }.join(',') %>]
+                    data: [<%= runners.first.runs.map { |r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.run_day_category_aggregate.mean_duration}]" }.join(',') %>]
                 }
                 <% end %>
             ]

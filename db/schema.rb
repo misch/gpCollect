@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150831131336) do
+ActiveRecord::Schema.define(version: 20150831135119) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,17 @@ ActiveRecord::Schema.define(version: 20150831131336) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "run_day_category_aggregates", force: :cascade do |t|
+    t.integer  "category_id",   null: false
+    t.integer  "run_day_id",    null: false
+    t.integer  "mean_duration"
+    t.integer  "runs_count"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "run_day_category_aggregates", ["category_id", "run_day_id"], name: "index_run_day_category_aggregates_on_category_id_and_run_day_id", using: :btree
 
   create_table "run_days", force: :cascade do |t|
     t.integer  "organizer_id"
