@@ -52,6 +52,9 @@ GEM
     autoprefixer-rails (5.2.1.2)
       execjs
       json
+    bh (1.3.4)
+      actionpack
+      activesupport
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     bootstrap-kaminari-views (0.0.5)
@@ -262,6 +265,7 @@ PLATFORMS
 
 DEPENDENCIES
   ajax-datatables-rails
+  bh
   bootstrap-kaminari-views
   bootstrap-sass
   byebug

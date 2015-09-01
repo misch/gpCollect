@@ -1,1 +1,23 @@
 <%= render 'chart', runners: @runners %>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th><%= Runner.human_attribute_name(:name) %></th>
+    <th><%= Runner.human_attribute_name(:club_or_hometown) %></th>
+    <th><%= Runner.human_attribute_name(:nationality) %></th>
+    <th><%= Runner.human_attribute_name(:runs_count) %></th>
+    <th><%= Runner.human_attribute_name(:mean_run_duration) %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @runners.each do |runner| %>
+      <tr>
+        <td><%= runner.name %></td>
+        <td><%= runner.club_or_hometown %></td>
+        <td><%= runner.nationality %></td>
+        <td><%= runner.runs_count %></td>
+        <td><%= runner.mean_run_duration %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,2 @@
+class RunnersDecorator < PaginationDecorator
+end
