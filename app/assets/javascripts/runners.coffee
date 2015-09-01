@@ -39,12 +39,14 @@ $ ->
     Cookies.getJSON('remembered_runners') || []
 
   update_remember_runner_icon = (id, runner_array, icon) ->
+    selected_icon = 'fa-star'
+    deselected_icon = 'fa-star-o'
     if id in runner_array
-      icon.removeClass('fa-star')
-      icon.addClass('fa-star-o')
+      icon.removeClass(deselected_icon)
+      icon.addClass(selected_icon)
     else
-      icon.removeClass('fa-star-o')
-      icon.addClass('fa-star')
+      icon.removeClass(selected_icon)
+      icon.addClass(deselected_icon)
 
   # Only search after a minimum of 3 characters were entered
   searchWait = 0
