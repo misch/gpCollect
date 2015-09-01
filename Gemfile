@@ -61,10 +61,11 @@ group :development do
   gem 'ruby-progressbar'
 
   # For easier deployment
-  gem 'capistrano-rails'
-  gem 'capistrano-service'
+  gem 'capistrano-rails', require: false
+  gem 'capistrano-service', require: false
   gem 'rvm1-capistrano3', require: false
-  gem 'capistrano-conditional', :require => false
+  gem 'capistrano-conditional', require: false
+  gem 'capistrano-rails-tail-log', require: false
 end
 
 group :development, :test do
