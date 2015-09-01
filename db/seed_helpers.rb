@@ -84,7 +84,8 @@ module SeedHelpers
         runner_hash = {}
         name = line[4 + shift]
         category_string = line[5 + shift]
-        runner_hash[:club_or_hometown] = line[6 + shift]
+        club_or_hometown = line[6 + shift]
+        runner_hash[:club_or_hometown] = club_or_hometown.blank? ? nil : club_or_hometown
         duration_string = line[10 + shift + duration_shift]
 
         # Don't create a runner/run if there is no category or duration associated.
