@@ -21,16 +21,8 @@ $ ->
     $('a[data-remember-runner]').on('click', (e) ->
       e.preventDefault()
       id = $(this).data("remember-runner")
-      runner_hash = get_remembered_runners()
-      if runner_hash[id]
-        # Remove id from remembered runners.
-        delete runner_hash[id]
-      else
-        name = $(this).data("remember-runner-name")
-        runner_hash[id] = name
-      update_remember_runner_icon(id, runner_hash, $(this).find('i'))
-      update_remembered_runner_panel(runner_hash)
-      Cookies.set('remembered_runners', runner_hash)
+      name = $(this).data("remember-runner-name")
+      toggle_remembered_runner(id, name)
     )
     $('a[data-remember-runner]').each ->
       id = $(this).data("remember-runner")
@@ -40,6 +32,19 @@ $ ->
 
   get_remembered_runners = ->
     Cookies.getJSON('remembered_runners') || {}
+
+  # Removes from remembered runners if present, adds otherwise. Name is only needed for adding, can be omitted removal.
+  toggle_remembered_runner = (id, name) ->
+    runner_hash = get_remembered_runners()
+    if runner_hash[id]
+    # Remove id from remembered runners.
+      delete runner_hash[id]
+    else
+      runner_hash[id] = name
+    Cookies.set('remembered_runners', runner_hash)
+    update_remember_runner_icon(id, runner_hash, $('a[data-remember-runner=' + id + '] i'))
+    update_remembered_runner_panel(runner_hash)
+
 
   update_remember_runner_icon = (id, runner_hash, icon) ->
     selected_icon = 'fa-star'
@@ -54,8 +59,14 @@ $ ->
   update_remembered_runner_panel = (runner_hash) ->
     panel = $('#remembered-runners-panel .panel-body')
     dismiss_button = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+    $('div[data-runner-id]').remove()
     $.each(runner_hash, (id, name) ->
-      panel.append('<div class="alert alert-info alert-dismissable">'+id + name + dismiss_button + '</span> ')
+      $('<div>' + name + dismiss_button + '</div>')
+      .addClass('alert alert-info alert-dismissable')
+      .attr('data-runner-id', id)
+      .on('close.bs.alert', ->
+        toggle_remembered_runner(id, null)
+      ).appendTo(panel)
     )
 
   # Only search after a minimum of 3 characters were entered
@@ -82,3 +93,4 @@ $ ->
     e.preventDefault()
     Cookies.remove('remembered_runners')
   )
+  update_remembered_runner_panel(get_remembered_runners())
