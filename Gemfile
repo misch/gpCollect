@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 ruby '2.2.1'
 
+gem 'dotenv-rails'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~>4.2.1'
 gem 'rails-i18n'
@@ -31,11 +33,6 @@ gem 'highcharts-rails'
 # Awesome icons
 gem 'font-awesome-rails'
 
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.0'
-# bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
-
 # Twitter bootstrap
 gem 'bootstrap-sass'
 
@@ -46,12 +43,6 @@ gem 'bootstrap-kaminari-views'
 # Decorators
 gem 'draper'
 
-# For tracking progress when seeding
-gem 'ruby-progressbar'
-
-# For heroku configuration
-gem 'rails_12factor', group: :production
-
 # For scraping web.
 gem 'mechanize'
 
@@ -61,6 +52,17 @@ gem 'thin'
 gem 'rack-mini-profiler'
 gem 'flamegraph'
 gem 'stackprof'
+
+group :development do
+  # For tracking progress when seeding
+  gem 'ruby-progressbar'
+
+  # For easier deployment
+  gem 'capistrano-rails'
+  gem 'capistrano-service'
+  gem 'rvm1-capistrano3', require: false
+  gem 'capistrano-conditional', :require => false
+end
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -81,5 +81,5 @@ test:
 production:
   <<: *default
   database: gpCollect_production
-  username: gpCollect
-  password: <%= ENV['GPCOLLECT_DATABASE_PASSWORD'] %>
+  username: postgres
+  password: <%= ENV['DATABASE_PRODUCTION_PASSWORD'] %>
