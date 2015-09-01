@@ -17,31 +17,33 @@ $ ->
   })
 
   dt.on('draw', ->
+    # Whenever the 'remember link is clicked, run this:
     $('a[data-remember-runner]').on('click', (e) ->
       e.preventDefault()
       id = $(this).data("remember-runner")
-      runner_array = get_remembered_runners()
-      index_of_id = runner_array.indexOf(id)
-      if index_of_id != -1
-        runner_array.splice(index_of_id, 1) # Removes id from array.
+      runner_hash = get_remembered_runners()
+      if runner_hash[id]
+        # Remove id from remembered runners.
+        delete runner_hash[id]
       else
-        runner_array.push(id)
-      update_remember_runner_icon(id, runner_array, $(this).find('i'))
-      Cookies.set('remembered_runners', runner_array)
+        name = $(this).data("remember-runner-name")
+        runner_hash[id] = name
+      update_remember_runner_icon(id, runner_hash, $(this).find('i'))
+      Cookies.set('remembered_runners', runner_hash)
     )
     $('a[data-remember-runner]').each ->
       id = $(this).data("remember-runner")
-      runner_array = get_remembered_runners()
-      update_remember_runner_icon(id, runner_array, $(this).find('i'))
+      runner_hash = get_remembered_runners()
+      update_remember_runner_icon(id, runner_hash, $(this).find('i'))
   )
 
   get_remembered_runners = ->
-    Cookies.getJSON('remembered_runners') || []
+    Cookies.getJSON('remembered_runners') || {}
 
-  update_remember_runner_icon = (id, runner_array, icon) ->
+  update_remember_runner_icon = (id, runner_hash, icon) ->
     selected_icon = 'fa-star'
     deselected_icon = 'fa-star-o'
-    if id in runner_array
+    if runner_hash[id]
       icon.removeClass(deselected_icon)
       icon.addClass(selected_icon)
     else
