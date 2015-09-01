@@ -19,4 +19,7 @@
 //= require js.cookie
 //= require bootstrap-sprockets
 //= require highcharts
+//= require nprogress
+//= require nprogress-turbolinks
+//= require nprogress-ajax
 //= require_tree .

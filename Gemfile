@@ -25,19 +25,23 @@ gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'ajax-datatables-rails'
 # Handling cookies easily in javascript
 gem 'js_cookie_rails'
+
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # For easier initialization
 gem 'jquery-turbolinks'
+# Slick progressbar for turbolinks
+gem 'nprogress-rails'
+
 # For charts
 gem 'highcharts-rails'
-# Awesome icons
-gem 'font-awesome-rails'
 
 # Twitter bootstrap
 gem 'bootstrap-sass'
 # Helpers for bootstrap
 gem 'bh'
+# Awesome icons
+gem 'font-awesome-rails'
 
 # For pagination
 gem 'kaminari'
