@@ -102,4 +102,16 @@ namespace :db do
     require_relative '../../db/merge_runners_helpers'
     MergeRunnersHelpers::merge_duplicates
   end
+
+  task create_run_aggregates: :environment do
+    RunDayCategoryAggregate.delete_all
+    ActiveRecord::Base.connection.reset_pk_sequence!(RunDayCategoryAggregate.table_name)
+
+    Category.all.each do |category|
+      RunDay.all.each do |run_day|
+        # Attributes are computed with hooks.
+        RunDayCategoryAggregate.create!(category: category, run_day: run_day)
+      end
+    end
+  end
 end
