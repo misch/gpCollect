@@ -45,7 +45,11 @@
                 <% runners.each do |runner| %>
                 {
                     name: "<%= runner.first_name %> <%= runner.last_name %>",
-                    data: [<%= runner.runs.map {|r| "[#{ruby_to_javascript_date(r.run_day.date)}, #{r.duration}]" }.join(',') %>]
+                    data: [<%= RunDay.all.map do |rd|
+                    run = runner.runs.find { |r| r.run_day == rd }
+                    duration = run.try(:duration) || 'null'
+                    "[#{ruby_to_javascript_date(rd.date)}, #{duration}]"
+                    end.join(',') %>]
                 },
                 <% end %>
                 <% if runners.size == 1 %>
