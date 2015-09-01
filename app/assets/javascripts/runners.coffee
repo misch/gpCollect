@@ -29,6 +29,7 @@ $ ->
         name = $(this).data("remember-runner-name")
         runner_hash[id] = name
       update_remember_runner_icon(id, runner_hash, $(this).find('i'))
+      update_remembered_runner_panel(runner_hash)
       Cookies.set('remembered_runners', runner_hash)
     )
     $('a[data-remember-runner]').each ->
@@ -49,6 +50,13 @@ $ ->
     else
       icon.removeClass(selected_icon)
       icon.addClass(deselected_icon)
+
+  update_remembered_runner_panel = (runner_hash) ->
+    panel = $('#remembered-runners-panel .panel-body')
+    dismiss_button = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+    $.each(runner_hash, (id, name) ->
+      panel.append('<div class="alert alert-info alert-dismissable">'+id + name + dismiss_button + '</span> ')
+    )
 
   # Only search after a minimum of 3 characters were entered
   searchWait = 0
