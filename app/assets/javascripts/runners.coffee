@@ -24,11 +24,14 @@ $ ->
       name = $(this).data("remember-runner-name")
       toggle_remembered_runner(id, name)
     )
+    update_all_remember_runner_icons()
+  )
+
+  update_all_remember_runner_icons = ->
+    runner_hash = get_remembered_runners()
     $('a[data-remember-runner]').each ->
       id = $(this).data("remember-runner")
-      runner_hash = get_remembered_runners()
       update_remember_runner_icon(id, runner_hash, $(this).find('i'))
-  )
 
   get_remembered_runners = ->
     Cookies.getJSON('remembered_runners') || {}
@@ -66,7 +69,7 @@ $ ->
       .attr('data-runner-id', id)
       .on('close.bs.alert', ->
         toggle_remembered_runner(id, null)
-      ).appendTo(panel)
+      ).prependTo(panel)
     )
 
   # Only search after a minimum of 3 characters were entered
@@ -92,5 +95,8 @@ $ ->
   $('a[data-forget-runners]').on('click', (e) ->
     e.preventDefault()
     Cookies.remove('remembered_runners')
+    runner_hash = get_remembered_runners()
+    update_remembered_runner_panel(runner_hash)
+    update_all_remember_runner_icons()
   )
   update_remembered_runner_panel(get_remembered_runners())
