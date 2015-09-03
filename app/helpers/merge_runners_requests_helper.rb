@@ -1,6 +1,6 @@
 module MergeRunnersRequestsHelper
 
-  MERGE_CANDIDATES_SHOWN_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown, :nationality]
+  MERGE_CANDIDATES_SHOWN_ATTRIBUTES = [:first_name, :last_name, :club_or_hometown, :sex, :nationality]
 
   def merge_candidates_table(merge_candidates)
     content_tag :table, class: 'table table-hover' do
