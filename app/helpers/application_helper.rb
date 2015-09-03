@@ -6,4 +6,17 @@ module ApplicationHelper
     super( objects, options )
   end
 
+  # Creates a horizontal, twitter bootstrap styled simple form.
+  # TODO: allow specifying additional wrapper mappings/class settings.
+  def horizontal_simple_form_for(record, options = {}, &block)
+    options.merge!(html: {class: 'form-horizontal'},
+                   wrapper: :horizontal_input_group,
+                   wrapper_mappings: {
+                       check_boxes: :horizontal_radio_and_checkboxes,
+                       radio_buttons: :horizontal_radio_and_checkboxes,
+                       file: :horizontal_file_input,
+                       boolean: :horizontal_boolean
+                   })
+    simple_form_for(record, options, &block)
+  end
 end
