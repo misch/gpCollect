@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :merge_runners_requests
   resources :categories
   resources :runs
   resources :runners do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150831135119) do
+ActiveRecord::Schema.define(version: 20150903070910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,21 @@ ActiveRecord::Schema.define(version: 20150831135119) do
     t.datetime "updated_at", null: false
     t.integer  "age_min"
     t.integer  "age_max"
+  end
+
+  create_table "merge_runners_requests", force: :cascade do |t|
+    t.string   "merged_first_name"
+    t.string   "merged_last_name"
+    t.string   "merged_club_or_hometown"
+    t.string   "merged_nationality"
+    t.string   "merged_sex"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "merge_runners_requests_runners", id: false, force: :cascade do |t|
+    t.integer "runner_id",                null: false
+    t.integer "merge_runners_request_id", null: false
   end
 
   create_table "organizers", force: :cascade do |t|

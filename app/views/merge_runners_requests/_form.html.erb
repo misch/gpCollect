@@ -1,0 +1,10 @@
+<%= horizontal_simple_form_for(@merge_runners_request) do |f| %>
+    <%= f.input :merged_first_name %>
+    <%= f.input :merged_last_name %>
+    <%= f.input :merged_club_or_hometown %>
+    <%= f.input :merged_nationality %><br>
+    <%= f.input :merged_sex %>
+    <div class="pull-right">
+      <%= f.button :submit %>
+    </div>
+<% end %>
