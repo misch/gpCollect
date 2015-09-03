@@ -1,5 +1,8 @@
 <%= merge_candidates_table(@merge_candidates) %>
 <%= horizontal_simple_form_for(@merge_runners_request) do |f| %>
+    <% @merge_runners_request.runner_ids.each do |id| %>
+        <%= f.hidden_field :runner_ids, multiple: true, value: id %>
+    <% end %>
     <%= f.input :merged_first_name %>
     <%= f.input :merged_last_name %>
     <%= f.input :merged_club_or_hometown %>

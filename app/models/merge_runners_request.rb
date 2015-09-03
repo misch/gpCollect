@@ -6,6 +6,7 @@ class MergeRunnersRequest < ActiveRecord::Base
     # Select most runner with most recent run as default for attributes of merge requests.
     best_mc = merge_candidates.max_by {|mc| mc.run_days.max_by(&:date) }
     merge_request_defaults = INHERITED_ATTRIBUTES.each_with_object({}) {|attr, hash| hash["merged_#{attr}"] = best_mc[attr]}
+    merge_request_defaults[:runners] = merge_candidates
     self.new(merge_request_defaults)
   end
 end

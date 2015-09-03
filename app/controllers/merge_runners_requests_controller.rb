@@ -55,6 +55,7 @@ class MergeRunnersRequestsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def merge_runner_request_params
-      params.require(:merge_runners_request).permit(:merged_first_name, :merged_last_name, :merged_club_or_hometown, :merged_nationality, :merged_sex)
+      params.require(:merge_runners_request).permit(:merged_first_name, :merged_last_name, :merged_club_or_hometown,
+                                                    :merged_nationality, :merged_sex, runner_ids: [])
     end
 end
