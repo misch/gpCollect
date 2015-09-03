@@ -6,6 +6,7 @@ class CreateMergeRunnersRequests < ActiveRecord::Migration
       t.string :merged_club_or_hometown
       t.string :merged_nationality
       t.string :merged_sex
+      t.date :merged_birth_date
 
       t.timestamps null: false
     end

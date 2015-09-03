@@ -3,6 +3,7 @@
     <% @merge_runners_request.runner_ids.each do |id| %>
         <%= f.hidden_field :runner_ids, multiple: true, value: id %>
     <% end %>
+    <%= f.hidden_field :merged_birth_date %>
     <%= f.input :merged_first_name %>
     <%= f.input :merged_last_name %>
     <%= f.input :merged_club_or_hometown %>

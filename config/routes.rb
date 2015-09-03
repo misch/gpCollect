@@ -1,11 +1,12 @@
 Rails.application.routes.draw do
-  resources :merge_runners_requests
+  resources :merge_runners_requests do
+    member do
+      get 'accept'
+    end
+  end
   resources :categories
   resources :runs
   resources :runners do
-    member do
-      get 'remember'
-    end
     collection do
       get 'show_remembered'
     end

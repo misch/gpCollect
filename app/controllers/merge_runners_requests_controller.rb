@@ -1,5 +1,5 @@
 class MergeRunnersRequestsController < ApplicationController
-  before_action :set_merge_runner_request, only: [:show, :edit, :update, :destroy]
+  before_action :set_merge_runner_request, only: [:show, :edit, :update, :destroy, :accept]
 
   # GET /merge_runner_requests
   def index
@@ -47,6 +47,18 @@ class MergeRunnersRequestsController < ApplicationController
     redirect_to merge_runners_requests_url, notice: 'Merge runner request was successfully destroyed.'
   end
 
+  def accept
+    new_runner = @merge_runners_request.to_new_runner
+    if new_runner.save!
+      @merge_runners_request.runners.destroy_all
+      flash[:info] = 'Successfully merged runner'
+      redirect_to runner_path(new_runner)
+    else
+      flash[:error] = 'Could not create new runner: ' + new_runner.errors
+      redirect_to merge_runners_requests_path
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_merge_runner_request
@@ -56,6 +68,6 @@ class MergeRunnersRequestsController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def merge_runner_request_params
       params.require(:merge_runners_request).permit(:merged_first_name, :merged_last_name, :merged_club_or_hometown,
-                                                    :merged_nationality, :merged_sex, runner_ids: [])
+                                                    :merged_nationality, :merged_sex, :merged_birth_date, runner_ids: [])
     end
 end
