@@ -3,17 +3,17 @@ class MergeRunnersRequestsController < ApplicationController
 
   # GET /merge_runner_requests
   def index
-    @merge_runners_requests = MergeRunnersRequest.all
+    @merge_runners_requests = MergeRunnersRequest.all.decorate
   end
 
   # GET /merge_runner_requests/1
   def show
+    @merge_runners_request = @merge_runners_request.decorate
   end
 
   # GET /merge_runner_requests/new
   def new
     merge_candidates = Runner.includes(:run_days).find(JSON.parse(cookies[:remembered_runners] || '{}').keys)
-    @merge_candidates = RunnersDecorator.decorate(merge_candidates)
     @merge_runners_request = MergeRunnersRequest.new_from(merge_candidates)
   end
 

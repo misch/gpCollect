@@ -27,7 +27,7 @@
 
 <p>
   <strong>Merge candidates:</strong>
-  <%= @merge_runners_request.runners.map { |r| link_to r.id, r }.join(', ').html_safe %>
+  <%= @merge_runners_request.runners %>
 </p>
 
 <%= link_to 'Edit', edit_merge_runners_request_path(@merge_runners_request) %> |

@@ -1,4 +1,4 @@
-<%= merge_candidates_table(@merge_candidates) %>
+<%= merge_candidates_table(@merge_runners_request.runners) %>
 <%= horizontal_simple_form_for(@merge_runners_request) do |f| %>
     <% @merge_runners_request.runner_ids.each do |id| %>
         <%= f.hidden_field :runner_ids, multiple: true, value: id %>
