@@ -12,6 +12,7 @@ class MergeRunnersRequestsController < ApplicationController
 
   # GET /merge_runner_requests/new
   def new
+    @merge_candidates = RunnersDecorator.decorate(Runner.find(JSON.parse(cookies[:remembered_runners] || '{}').keys))
     @merge_runners_request = MergeRunnersRequest.new
   end
 
