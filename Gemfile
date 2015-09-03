@@ -53,6 +53,9 @@ gem 'draper'
 # For scraping web.
 gem 'mechanize'
 
+# For easy, pretty forms
+gem 'simple_form'
+
 gem 'thin'
 
 # For performance evaluation:
