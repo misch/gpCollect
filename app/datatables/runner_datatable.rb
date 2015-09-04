@@ -56,17 +56,28 @@ class RunnerDatatable < AjaxDatatablesRails::Base
       Rails.logger.debug(params[:search][:value])
       search_for = params[:search][:value].split(' ')
       where_clause = search_for.map do |unescaped_term|
+        first_column = model_and_column_to_arel_node(searchable_columns.first)
+        concatenated = searchable_columns[1..-1].inject(first_column) do |concated, model_and_column|
+          arel_column = model_and_column_to_arel_node(model_and_column)
+          concated.concat(::Arel::Nodes::build_quoted(';')).concat(arel_column)
+        end
+        unaccented_concatenated = ::Arel::Nodes::NamedFunction.new('f_unaccent', [concatenated])
         term = "%#{sanitize_sql_like(unescaped_term)}%"
-        searchable_columns.map do |model_and_column|
-          model, column = model_and_column.split('.')
-          model = model.constantize
-          unaccented_column = ::Arel::Nodes::NamedFunction.new('f_unaccent', [model.arel_table[column.to_sym]])
-          unaccented_column.matches(::Arel::Nodes::NamedFunction.new('f_unaccent', [::Arel::Nodes::build_quoted(term)]))
-        end.reduce(:or)
+        unaccented_concatenated.matches(::Arel::Nodes::NamedFunction.new('f_unaccent', [::Arel::Nodes::build_quoted(term)]))
       end.reduce(:and)
+      puts where_clause.inspect
       records.select('*, count(*) OVER() as filtered_count').where(where_clause)
     else
       records
     end
   end
+
+  private
+
+  def model_and_column_to_arel_node(model_and_column)
+    model, column = model_and_column.split('.')
+    model = model.constantize
+    model.arel_table[column.to_sym]
+  end
+
 end
