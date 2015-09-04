@@ -18,7 +18,7 @@
 //= require turbolinks
 //= require js.cookie
 //= require bootstrap-sprockets
-//= require highcharts
+//= require highcharts/highcharts
 //= require nprogress
 //= require nprogress-turbolinks
 //= require nprogress-ajax
