@@ -14,12 +14,12 @@ class CompareRunnersChart < LazyHighCharts::HighChart
       self.series(name: runner.name,
                   data: data)
     end
+    # Show additionally category mean for every year we have runs for.
     if runners.size == 1
-
+      self.series(name: 'Category mean',
+                  data: runners.first.runs.map { |r| [LazyHighCharts::OptionsKeyFilter.date_to_js_code(r.run_day.date),
+                                                      r.run_day_category_aggregate.mean_duration] })
     end
-    self.series(name: 'Category mean',
-                data: runners.first.runs.map { |r| [LazyHighCharts::OptionsKeyFilter.date_to_js_code(r.run_day.date),
-                                                    r.run_day_category_aggregate.mean_duration] })
   end
 
   ### Copied private helpers from lazy_high_charts/lib/lazy_high_charts/layout_helper.rb
