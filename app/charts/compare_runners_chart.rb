@@ -22,7 +22,6 @@ class CompareRunnersChart < LazyHighCharts::HighChart
     end
   end
 
-  ### Copied private helpers from lazy_high_charts/lib/lazy_high_charts/layout_helper.rb
   private
 
   def set_options
@@ -61,6 +60,8 @@ class CompareRunnersChart < LazyHighCharts::HighChart
     )
     self.legend(layout: 'horizontal')
   end
+
+  ### Copied private helpers from lazy_high_charts/lib/lazy_high_charts/layout_helper.rb
 
   def generate_json_from_value value
     if value.is_a? Hash
