@@ -17,36 +17,60 @@ $ ->
   })
 
   dt.on('draw', ->
+    # Whenever the 'remember link is clicked, run this:
     $('a[data-remember-runner]').on('click', (e) ->
       e.preventDefault()
       id = $(this).data("remember-runner")
-      runner_array = get_remembered_runners()
-      index_of_id = runner_array.indexOf(id)
-      if index_of_id != -1
-        runner_array.splice(index_of_id, 1) # Removes id from array.
-      else
-        runner_array.push(id)
-      update_remember_runner_icon(id, runner_array, $(this).find('i'))
-      Cookies.set('remembered_runners', runner_array)
+      name = $(this).data("remember-runner-name")
+      toggle_remembered_runner(id, name)
     )
-    $('a[data-remember-runner]').each ->
-      id = $(this).data("remember-runner")
-      runner_array = get_remembered_runners()
-      update_remember_runner_icon(id, runner_array, $(this).find('i'))
+    update_all_remember_runner_icons()
   )
 
-  get_remembered_runners = ->
-    Cookies.getJSON('remembered_runners') || []
+  update_all_remember_runner_icons = ->
+    runner_hash = get_remembered_runners()
+    $('a[data-remember-runner]').each ->
+      id = $(this).data("remember-runner")
+      update_remember_runner_icon(id, runner_hash, $(this).find('i'))
 
-  update_remember_runner_icon = (id, runner_array, icon) ->
+  get_remembered_runners = ->
+    Cookies.getJSON('remembered_runners') || {}
+
+  # Removes from remembered runners if present, adds otherwise. Name is only needed for adding, can be omitted removal.
+  toggle_remembered_runner = (id, name) ->
+    runner_hash = get_remembered_runners()
+    if runner_hash[id]
+    # Remove id from remembered runners.
+      delete runner_hash[id]
+    else
+      runner_hash[id] = name
+    Cookies.set('remembered_runners', runner_hash)
+    update_remember_runner_icon(id, runner_hash, $('a[data-remember-runner=' + id + '] i'))
+    update_remembered_runner_panel(runner_hash)
+
+
+  update_remember_runner_icon = (id, runner_hash, icon) ->
     selected_icon = 'fa-star'
     deselected_icon = 'fa-star-o'
-    if id in runner_array
+    if runner_hash[id]
       icon.removeClass(deselected_icon)
       icon.addClass(selected_icon)
     else
       icon.removeClass(selected_icon)
       icon.addClass(deselected_icon)
+
+  update_remembered_runner_panel = (runner_hash) ->
+    panel = $('#remembered-runners-panel .panel-body')
+    dismiss_button = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+    $('div[data-runner-id]').remove()
+    $.each(runner_hash, (id, name) ->
+      $('<div>' + name + dismiss_button + '</div>')
+      .addClass('alert alert-info alert-dismissable')
+      .attr('data-runner-id', id)
+      .on('close.bs.alert', ->
+        toggle_remembered_runner(id, null)
+      ).prependTo(panel)
+    )
 
   # Only search after a minimum of 3 characters were entered
   searchWait = 0
@@ -71,4 +95,8 @@ $ ->
   $('a[data-forget-runners]').on('click', (e) ->
     e.preventDefault()
     Cookies.remove('remembered_runners')
+    runner_hash = get_remembered_runners()
+    update_remembered_runner_panel(runner_hash)
+    update_all_remember_runner_icons()
   )
+  update_remembered_runner_panel(get_remembered_runners())

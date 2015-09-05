@@ -73,7 +73,8 @@ class RunnersController < ApplicationController
 
   def show_remembered
     if cookies[:remembered_runners]
-      @runners = RunnersDecorator.decorate(Runner.includes(:runs, :run_days).find(JSON.parse(cookies[:remembered_runners])))
+      runner_ids = JSON.parse(cookies[:remembered_runners]).keys
+      @runners = RunnersDecorator.decorate(Runner.includes(:runs, :run_days).find(runner_ids))
     else
       @runners = []
     end

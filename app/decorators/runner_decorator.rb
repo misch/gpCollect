@@ -6,6 +6,10 @@ class RunnerDecorator < Draper::Decorator
     "#{object.first_name} #{object.last_name}"
   end
 
+  def fastest_run_duration
+    h.format_duration(object.fastest_run.duration)
+  end
+
   def mean_run_duration
     h.format_duration(object.mean_run_duration)
   end

@@ -1,20 +1,32 @@
 <p id="notice"><%= notice %></p>
 
 <h1>Listing Runners</h1>
-<table class="table table-hover" id="runners-datatable" data-source="<%= runners_path(format: :json) %>">
-  <thead>
-    <tr>
-      <th>First name</th>
-      <th>Last name</th>
-      <th>Club or hometown</th>
-      <th>Sex</th>
-      <th>Nationality</th>
-      <th>Participations</th>
-      <th>Best time</th>
-      <th></th>
-    </tr>
-  </thead>
+<div class="row">
+  <div class="col-lg-9">
+    <table class="table table-hover" id="runners-datatable" data-source="<%= runners_path(format: :json) %>">
+      <thead>
+      <tr>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Club or hometown</th>
+        <th>Sex</th>
+        <th>Nationality</th>
+        <th>Participations</th>
+        <th>Best time</th>
+        <th></th>
+      </tr>
+      </thead>
 
-  <tbody>
-  </tbody>
-</table>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-lg-3">
+    <%= panel heading: 'Remembered runners', context: :info, id: 'remembered-runners-panel' do %>
+        <div class='panel-body'>
+          <%= link_to t('.show_remembered_runners'), show_remembered_runners_path, class: 'btn btn-primary btn-block' %>
+          <%= link_to t('.forget_remembered_runners'), '#', data: {forget_runners: true}, class: 'btn btn-danger btn-block' %>
+        </div>
+    <% end %>
+  </div>
+</div>

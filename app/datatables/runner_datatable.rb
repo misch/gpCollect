@@ -28,7 +28,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
   private
 
   def data
-    records.map do |record|
+    RunnerDecorator.decorate_collection(records).map do |record|
       [
           record.first_name,
           record.last_name,
@@ -36,9 +36,11 @@ class RunnerDatatable < AjaxDatatablesRails::Base
           record.sex,
           record.nationality,
           record.runs_count,
-          record.fastest_run.decorate.duration_formatted,
+          record.fastest_run_duration,
           link_to(fa_icon('eye lg'), runner_path(record)) + ' ' +
-              link_to(content_tag(:i, '', class: 'fa fa-lg'), '#', data: {remember_runner: record.id})
+              link_to(content_tag(:i, '', class: 'fa fa-lg'), '#',
+                      data: {remember_runner: record.id,
+                             remember_runner_name: record.name})
       ]
     end
   end
