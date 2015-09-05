@@ -10,6 +10,7 @@ class MergeRunnersRequest < ActiveRecord::Base
   # TODO: Add possibly validation for edit-distance between merged and inherited attribute name.
   validates :merged_nationality, format: /\A[A-Z]{3}\z/
   validates :merged_sex, inclusion: { in: VALID_SEXES }
+  validates_with MergeRunnersRequestsRunDaysValidator
 
   def self.new_from(merge_candidates)
     # Select most runner with most recent run as default for attributes of merge requests.
