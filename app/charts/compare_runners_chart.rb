@@ -1,12 +1,12 @@
 class CompareRunnersChart < LazyHighCharts::HighChart
   def initialize(runners)
     super('graph')
+    @all_run_days = RunDay.all
     set_options
 
     ## Fill with data
-    all_run_days = RunDay.all
     runners.each do |runner|
-      data = all_run_days.map do |rd|
+      data = @all_run_days.map do |rd|
         run = runner.runs.find { |r| r.run_day == rd }
         duration = run.try(:duration)
         [LazyHighCharts::OptionsKeyFilter.date_to_js_code(rd.date), duration]
@@ -16,9 +16,18 @@ class CompareRunnersChart < LazyHighCharts::HighChart
     end
     # Show additionally category mean for every year we have runs for.
     if runners.size == 1
+      runner = runners.first
+      data = @all_run_days.map do |rd|
+        run = runner.runs.find { |r| r.run_day == rd }
+        duration = if run
+                     run.run_day_category_aggregate.mean_duration
+                   else
+                     nil
+                   end
+        [LazyHighCharts::OptionsKeyFilter.date_to_js_code(rd.date), duration]
+      end
       self.series(name: 'Category mean',
-                  data: runners.first.runs.map { |r| [LazyHighCharts::OptionsKeyFilter.date_to_js_code(r.run_day.date),
-                                                      r.run_day_category_aggregate.mean_duration] })
+                  data: data)
     end
   end
 
@@ -26,7 +35,7 @@ class CompareRunnersChart < LazyHighCharts::HighChart
 
   def set_options
     self.title(text: nil)
-    x_axis_ticks = RunDay.all.pluck(:date).map { |run_day_date| LazyHighCharts::OptionsKeyFilter.date_to_js_code(run_day_date) }
+    x_axis_ticks = @all_run_days.map { |run_day| LazyHighCharts::OptionsKeyFilter.date_to_js_code(run_day.date) }
     self.xAxis(type: "datetime",
                tickPositioner: "function() {
                  var ticks = [#{generate_json_from_array(x_axis_ticks)}];
