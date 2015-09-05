@@ -7,7 +7,7 @@
     <%= f.input :merged_first_name %>
     <%= f.input :merged_last_name %>
     <%= f.input :merged_club_or_hometown %>
-    <%= f.input :merged_sex %>
+    <%= f.input :merged_sex, collection: MergeRunnersRequest::VALID_SEXES, include_blank: false %>
     <%= f.input :merged_nationality %>
     <div class="pull-right">
       <%= f.button :submit %>

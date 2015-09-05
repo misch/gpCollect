@@ -3,12 +3,13 @@ class MergeRunnersRequest < ActiveRecord::Base
   has_many :runs, through: :runners
 
   INHERITED_ATTRIBUTES = [:first_name, :last_name, :nationality, :sex, :club_or_hometown, :birth_date]
+  VALID_SEXES = %w(M W)
 
   validates_presence_of *INHERITED_ATTRIBUTES.map { |attr| "merged_#{attr}" }
   # TODO: Add validation for non-intersecting run days
   # TODO: Add possibly validation for edit-distance between merged and inherited attribute name.
   validates :merged_nationality, format: /\A[A-Z]{3}\z/
-  validates :merged_sex, inclusion: { in: %w(M W) }
+  validates :merged_sex, inclusion: { in: VALID_SEXES }
 
   def self.new_from(merge_candidates)
     # Select most runner with most recent run as default for attributes of merge requests.
