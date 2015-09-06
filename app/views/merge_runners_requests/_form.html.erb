@@ -1,5 +1,5 @@
 <%= merge_candidates_table(@merge_runners_request.runners) %>
-<% if @merge_runners_request.errors[:runners] %>
+<% if @merge_runners_request.errors[:runners].any? %>
     <%= alert_box @merge_runners_request.errors[:runners].join(', '), context: :danger %>
 <% end %>
 <%= horizontal_simple_form_for(@merge_runners_request) do |f| %>

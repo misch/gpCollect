@@ -50,7 +50,7 @@ class MergeRunnersRequestsController < ApplicationController
   def accept
     new_runner = @merge_runners_request.to_new_runner
     if new_runner.save!
-      @merge_runners_request.runners.destroy_all
+      @merge_runners_request.runners.each &:destroy!
       flash[:info] = 'Successfully merged runner'
       redirect_to runner_path(new_runner)
     else
