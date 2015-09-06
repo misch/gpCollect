@@ -15,6 +15,11 @@ class MergeRunnersRequestsController < ApplicationController
   def new
     merge_candidates = Runner.includes(:run_days).find(JSON.parse(cookies[:remembered_runners] || '{}').keys)
     @merge_runners_request = MergeRunnersRequest.new_from(merge_candidates)
+    unless @merge_runners_request.valid?
+      # Runners can not be merged, show them instead.
+      flash[:error] = @merge_runners_request.errors[:runners]
+      redirect_to show_remembered_runners_path
+    end
   end
 
   # GET /merge_runner_requests/1/edit
@@ -26,6 +31,8 @@ class MergeRunnersRequestsController < ApplicationController
     @merge_runners_request = MergeRunnersRequest.new(merge_runner_request_params)
 
     if @merge_runners_request.save
+      # Delete cookie.
+      cookies[:remembered_runners] = nil
       redirect_to @merge_runners_request, notice: 'Merge runner request was successfully created.'
     else
       render :new
