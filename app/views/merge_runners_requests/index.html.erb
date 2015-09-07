@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Merge Runner Requests</h1>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Merged first name</th>
+      <th>Merged last name</th>
+      <th>Merged club or hometown</th>
+      <th>Merged nationality</th>
+      <th>Merged sex</th>
+      <th>Merge candidates</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @merge_runners_requests.each do |merge_runners_request| %>
+      <tr>
+        <td><%= merge_runners_request.merged_first_name %></td>
+        <td><%= merge_runners_request.merged_last_name %></td>
+        <td><%= merge_runners_request.merged_club_or_hometown %></td>
+        <td><%= merge_runners_request.merged_nationality %></td>
+        <td><%= merge_runners_request.merged_sex %></td>
+        <td><%= merge_runners_request.runners %></td>
+        <td><%= link_to 'Show', merge_runners_request_path(merge_runners_request) %></td>
+        <td><%= link_to 'Edit', edit_merge_runners_request_path(merge_runners_request) %></td>
+        <td><%= link_to 'Accept', accept_merge_runners_request_path(merge_runners_request),
+                        data: { confirm: 'Are you sure you want to accept?' } %></td>
+        <td><%= link_to 'Destroy', merge_runners_request_path(merge_runners_request),
+                        method: :delete, data: { confirm: 'Are you sure you want delete?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Merge runner request', new_merge_runners_request_path %>

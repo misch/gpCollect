@@ -1,0 +1,18 @@
+<%= merge_candidates_table(@merge_runners_request.runners) %>
+<% if @merge_runners_request.errors[:runners].any? %>
+    <%= alert_box @merge_runners_request.errors[:runners].join(', '), context: :danger %>
+<% end %>
+<%= horizontal_simple_form_for(@merge_runners_request) do |f| %>
+    <% @merge_runners_request.runner_ids.each do |id| %>
+        <%= f.hidden_field :runner_ids, multiple: true, value: id %>
+    <% end %>
+    <%= f.hidden_field :merged_birth_date %>
+    <%= f.input :merged_first_name %>
+    <%= f.input :merged_last_name %>
+    <%= f.input :merged_club_or_hometown %>
+    <%= f.input :merged_sex, collection: MergeRunnersRequest::VALID_SEXES, include_blank: false %>
+    <%= f.input :merged_nationality %>
+    <div class="pull-right">
+      <%= f.button :submit %>
+    </div>
+<% end %>
