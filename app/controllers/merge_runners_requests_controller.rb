@@ -1,5 +1,6 @@
 class MergeRunnersRequestsController < ApplicationController
   before_action :set_merge_runner_request, only: [:show, :edit, :update, :destroy, :accept]
+  before_action :authenticate_admin!, except: [:new, :create]
 
   # GET /merge_runner_requests
   def index
@@ -34,7 +35,7 @@ class MergeRunnersRequestsController < ApplicationController
     if @merge_runners_request.save
       # Delete cookie.
       cookies[:remembered_runners] = nil
-      redirect_to @merge_runners_request, notice: 'Merge runner request was successfully created.'
+      redirect_to runners_path, notice: 'Merge runner request was successfully created.'
     else
       render :new
     end

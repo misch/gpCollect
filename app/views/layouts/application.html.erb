@@ -17,6 +17,13 @@
             <%= link_to 'Runs', runs_path %>
             <%= link_to 'Categories', categories_path %>
         <% end %>
+        <%= nav class: 'navbar-right' do %>
+            <% if current_admin %>
+                <%= link_to 'Logout', destroy_admin_session_path, method: 'delete' %>
+            <% else %>
+                <%= link_to 'Login', new_admin_session_path %>
+            <% end %>
+        <% end %>
     <% end %>
 <% end %>
 <div class="container" role="main">
