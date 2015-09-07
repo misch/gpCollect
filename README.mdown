@@ -1,0 +1,27 @@
+# GP Collect
+
+This application seeks to make the results from different iterations of the Grand Prix Bern more easily browsable.
+The data has been scraped from http://results.gpbern.ch/2015/.
+
+## System dependencies
+
+This project uses Postgresql as database. Make sure, you also have additional modules installed
+(at the time of writing, the modules `unaccent` and `pg_trgm` are used). On a debian derivative, these can be installed
+with
+
+    sudo apt-get install postgresql-contrib
+
+Apart from that, there are no system dependencies. Just run `bundle install` for the ruby dependencies.
+
+## Database creation
+
+As usual for a rails app, run the commands `rake db:create` and `rake db:migrate` to get the database ready for seeding.
+Then get the
+seed data either by running `rake db:scrape_data` and `rake db:scrape_old_data` or requesting the files from a
+contributor (place the data manually in `db/data`. Once you have all files necessary, run
+
+    rake db:seed
+
+## Tests
+
+TODO

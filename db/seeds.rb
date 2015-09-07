@@ -40,3 +40,4 @@ files = (1999..2006).map { |year| {file: "db/data/gp_bern_10m_#{year}.csv",
 files.each { |file| SeedHelpers::seed_runs_file file }
 
 MergeRunnersHelpers::merge_duplicates
+Rake::Task['db:create_run_aggregates'].invoke
