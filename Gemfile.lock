@@ -120,8 +120,7 @@ GEM
     git (1.2.9.1)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
-    highcharts-rails (4.1.8)
-      railties (>= 3.1)
+    hash-deep-merge (0.1.1)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     i18n (0.7.0)
@@ -138,6 +137,9 @@ GEM
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
+    lazy_high_charts (1.5.4)
+      bundler (>= 1.0)
+      hash-deep-merge
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -283,12 +285,12 @@ DEPENDENCIES
   draper
   flamegraph
   font-awesome-rails
-  highcharts-rails
   jquery-datatables-rails!
   jquery-rails
   jquery-turbolinks
   js_cookie_rails
   kaminari
+  lazy_high_charts
   mechanize
   nprogress-rails
   pg

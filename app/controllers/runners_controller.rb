@@ -13,6 +13,7 @@ class RunnersController < ApplicationController
   # GET /runners/1
   # GET /runners/1.json
   def show
+    @chart = CompareRunnersChart.new([@runner])
   end
 
   # GET /runners/new
@@ -64,13 +65,6 @@ class RunnersController < ApplicationController
     end
   end
 
-  def remember
-    session[:runner_ids] ||= []
-    session[:runner_ids] << @runner.id
-    session[:runner_ids].uniq!
-    render json: @runner
-  end
-
   def show_remembered
     if cookies[:remembered_runners]
       runner_ids = JSON.parse(cookies[:remembered_runners]).keys
@@ -78,6 +72,7 @@ class RunnersController < ApplicationController
     else
       @runners = []
     end
+    @chart = CompareRunnersChart.new(@runners)
   end
 
   private

@@ -34,7 +34,7 @@ gem 'jquery-turbolinks'
 gem 'nprogress-rails'
 
 # For charts
-gem 'highcharts-rails'
+gem 'lazy_high_charts'
 
 # Twitter bootstrap
 gem 'bootstrap-sass'
