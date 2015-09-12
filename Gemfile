@@ -56,6 +56,10 @@ gem 'mechanize'
 # For easy, pretty forms
 gem 'simple_form'
 
+# For authentication/login
+gem 'devise'
+gem 'devise-i18n'
+
 gem 'thin'
 
 # For performance evaluation:

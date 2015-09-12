@@ -10,7 +10,7 @@ module ApplicationHelper
   # TODO: allow specifying additional wrapper mappings/class settings.
   def horizontal_simple_form_for(record, options = {}, &block)
     options.merge!(html: {class: 'form-horizontal'},
-                   wrapper: :horizontal_input_group,
+                   wrapper: :horizontal_form,
                    wrapper_mappings: {
                        check_boxes: :horizontal_radio_and_checkboxes,
                        radio_buttons: :horizontal_radio_and_checkboxes,
