@@ -1,4 +1,5 @@
-<%= render 'chart', runners: @runners %>
+<div id="runs_chart" style="width:100%; height:300px;"></div>
+<%= high_chart("runs_chart", @chart)  %>
 <table class="table table-striped">
   <thead>
   <tr>

@@ -13,7 +13,8 @@
 <% if @runner.runs.empty? %>
     No runs available
 <% else %>
-    <%= render 'chart', runners: [@runner] %>
+    <div id="runs_chart" style="width:100%; height:300px;"></div>
+    <%= high_chart("runs_chart", @chart)  %>
     <table class="table table-striped">
       <thead>
       <th><%= Run.human_attribute_name :run_date %></th>
