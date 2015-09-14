@@ -19,10 +19,22 @@ class RunnerDatatable < AjaxDatatablesRails::Base
     filtered_count = (records.blank? ? 0 : records.first['filtered_count']) || total_count
     {
         :draw => params[:draw].to_i,
-        :recordsTotal =>  total_count,
+        :recordsTotal => total_count,
         :recordsFiltered => filtered_count,
         :data => filtered_data
     }
+  end
+
+  def records
+    if @records.nil?
+      ActiveRecord::Base.transaction do
+        # Disable index scan in case a search filter is given. This makes sql choose the 'gin' index for these queries,
+        # returning results much faster.
+        ActiveRecord::Base.connection.execute('SET LOCAL enable_indexscan = off;') if has_filter
+        @records = fetch_records.load
+      end
+    end
+    @records
   end
 
   private
@@ -46,7 +58,11 @@ class RunnerDatatable < AjaxDatatablesRails::Base
   end
 
   def get_raw_records
-    Runner.all.includes(:runs, :categories)
+    Runner.all.includes(:runs)
+  end
+
+  def has_filter
+    params[:search].present? and not params[:search][:value].blank?
   end
 
   # Overrides the filter method defined from the gem. When searching, we ignore all accents, so a search for 'théo'
@@ -54,7 +70,7 @@ class RunnerDatatable < AjaxDatatablesRails::Base
   # Every word (separated by space) will be searched individually in all searchable columns. Only rows that satisfy all
   # words (in some column) are returned.
   def filter_records(records)
-    if params[:search].present? and not params[:search][:value].blank?
+    if has_filter
       Rails.logger.debug(params[:search][:value])
       search_for = params[:search][:value].split(' ')
       where_clause = search_for.map do |unescaped_term|
