@@ -1,3 +1,19 @@
+# Monkey patch address class
+module Faker
+  class Address
+
+    def self.nationality
+      %w[SUI NED USA AFG ALB AND].sample
+    end
+  end
+
+  class Name
+    def self.sex
+      %w(M W).sample
+    end
+  end
+end
+
 FactoryGirl.define do
   factory :category do
     sex 'M'
@@ -20,10 +36,10 @@ FactoryGirl.define do
     last_name { Faker::Name.last_name }
     club_or_hometown { Faker::Address.city }
     birth_date { Faker::Date.between(50.years.ago, 20.years.ago) }
-    # user_with_posts will create post data after the user has been created
+    nationality { Faker::Address.nationality }
+    sex { Faker::Name.sex }
+
     factory :runner_with_runs do
-      # posts_count is declared as a transient attribute and available in
-      # attributes on the factory, as well as the callback via the evaluator
       transient do
         runs_count 3
       end
