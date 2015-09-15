@@ -1,4 +1,4 @@
-# GP Collect [![Test Coverage](https://codeclimate.com/github/panmari/gpCollect/badges/coverage.svg)](https://codeclimate.com/github/simplay/panmari/gpCollect) [![Code Climate](https://codeclimate.com/github/panmari/gpCollect/badges/gpa.svg)](https://codeclimate.com/github/panmari/gpCollect)
+# GP Collect [![Build Status](https://travis-ci.org/panmari/gpCollect.svg?branch=master)](https://travis-ci.org/panmari/gpCollect) [![Test Coverage](https://codeclimate.com/github/panmari/gpCollect/badges/coverage.svg)](https://codeclimate.com/github/simplay/panmari/gpCollect) [![Code Climate](https://codeclimate.com/github/panmari/gpCollect/badges/gpa.svg)](https://codeclimate.com/github/panmari/gpCollect)
 
 This application seeks to make the results from different iterations of the Grand Prix Bern more easily browsable.
 The data has been scraped from http://results.gpbern.ch/2015/.
