@@ -1,6 +1,6 @@
 class RuntimeChart < LazyHighCharts::HighChart
-  def initialize
-    super('graph')
+  def initialize(type='graph')
+    super(type)
     @all_run_days = RunDay.all
     set_options
   end
