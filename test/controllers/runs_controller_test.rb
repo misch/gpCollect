@@ -15,12 +15,4 @@ class RunsControllerTest < ActionController::TestCase
     get :show, id: @run
     assert_response :success
   end
-
-  test "should destroy run" do
-    assert_difference('Run.count', -1) do
-      delete :destroy, id: @run
-    end
-
-    assert_redirected_to runs_path
-  end
 end
