@@ -63,14 +63,17 @@ $ ->
     panel = $('#remembered-runners-panel .panel-body')
     dismiss_button = '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
     $('div[data-runner-id]').remove()
-    $.each(runner_hash, (id, name) ->
+    runner_ids_sorted = Object.keys(runner_hash).sort( (a,b) ->
+      -runner_hash[a].localeCompare(runner_hash[b])
+    )
+    for id in runner_ids_sorted
+      name = runner_hash[parseInt(id)]
       $('<div>' + name + dismiss_button + '</div>')
       .addClass('alert alert-info alert-dismissable')
       .attr('data-runner-id', id)
       .on('close.bs.alert', ->
         toggle_remembered_runner(id, null)
       ).prependTo(panel)
-    )
 
   # Only search after a minimum of 3 characters were entered
   searchWait = 0
