@@ -26,6 +26,7 @@ FactoryGirl.define do
 
   factory :run do
     duration { Faker::Number.between(4618000, 5366200) }
+    interim_times { [Faker::Number.between(1618000, 2366200), Faker::Number.between(2618000, 3366200)]}
     category
     run_day
     runner
