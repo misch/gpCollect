@@ -5,8 +5,8 @@ module SeedHelpers
 
   # TODO: Possibly handle disqualified cases better.
   # Right now they have nil as duration (but still have an entry in the run table).
-  def self.duration_string_to_milliseconds(duration_string)
-    if duration_string == 'DSQ'
+  def self.duration_string_to_milliseconds(duration_string, allow_blank=false)
+    if duration_string == 'DSQ' or (duration_string.blank? and allow_blank)
       nil
     else
       matches = duration_string.match(DURATION_REGEXP)
@@ -113,11 +113,10 @@ module SeedHelpers
 
           runner = find_or_create_runner_for(runner_hash, run_day, category)
 
-          # TODO: Somehow handle this over multiple years (allow change of hometown)
-          #runner.update_attributes!(club_or_hometown: club_or_hometown)
-          # TODO: think of something to handle intermediary times.
+          interim_times = [duration_string_to_milliseconds(line[8 + shift + duration_shift], true),
+                           duration_string_to_milliseconds(line[9 + shift + duration_shift], true)]
           Run.create!(runner: runner, category: category, duration: duration_string_to_milliseconds(duration_string),
-                      run_day: run_day)
+                      run_day: run_day, interim_times: interim_times)
           progressbar.increment
         rescue Exception => e
           puts "Failed parsing: #{line}"

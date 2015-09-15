@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150907192559) do
+ActiveRecord::Schema.define(version: 20150915161842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -116,11 +116,12 @@ ActiveRecord::Schema.define(version: 20150907192559) do
 
   create_table "runs", force: :cascade do |t|
     t.integer  "runner_id"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
     t.integer  "category_id"
-    t.integer  "duration",    limit: 8
+    t.integer  "duration",      limit: 8
     t.integer  "run_day_id"
+    t.integer  "interim_times",                        array: true
   end
 
   add_index "runs", ["category_id"], name: "index_runs_on_category_id", using: :btree

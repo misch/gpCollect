@@ -1,3 +1,7 @@
+require_relative '../../db/seed_helpers'
+require_relative '../../app/helpers/runs_helper'
+include RunsHelper
+
 module ScrapeHelpers
   NAME_LOCATION_REGEXP = /^(?<rank_category>\d+). (?<name>[^,]+)(?:, (?<location>.+))?$/
   RUN_TYPE_OVERALL_RANK_REGEXP = /^[A-Z]+\/(?<rank>\d+).$/
@@ -45,20 +49,36 @@ module ScrapeHelpers
 
     start_number = row[options.fetch(:start_number_column, 4)].gsub(')', '')
 
-    if row.size >= 10
-      km5 = row[7]
-      # TODO: km10 is actually row[7] + row[9]
-      km10 = row[9]
+    if options.fetch(:with_interim_times, false)
+      # Time here is interpreted as 'from last checkpoint to this checkpoint'. In db however, we expect
+      # 'from start to this checkpoint'
+      km5_split = row[7].split(' ')
+      km5 = km5_split[0].include?('-') ? nil : km5_split[0].gsub('.', ':').gsub(',', '.')
+      km10_idx = if km5_split.size == 1
+                   9
+                 else
+                   8
+                 end
+      km10_split = row[km10_idx].split(' ')
+      km5_to_km10 = km10_split[0].gsub('.', ':').gsub(',', '.')
+      if km5_to_km10.include?('-')
+        km10 = nil
+      else
+        km5_int = SeedHelpers.duration_string_to_milliseconds(km5)
+        km10_int = SeedHelpers.duration_string_to_milliseconds(km5_to_km10)
+        km10 = format_duration(km5_int + km10_int)
+      end
       # Not used
-      km10toFinish = row[11]
+      #km10toFinish = row[11]
     else
       km5 = nil
+      km10 = nil
     end
     rank_match = RUN_TYPE_OVERALL_RANK_REGEXP.match(row[5])
     if rank_match
       rank = rank_match[:rank]
     end
-    [rank, rank_category, nil, start_number, csv_name, category, club_or_hometown, km5, nil, nil, time, birth_year]
+    [rank, rank_category, nil, start_number, csv_name, category, club_or_hometown, nil, km5, km10, time, birth_year]
   end
 
   COMPOSED_LAST_NAME_STARTERS = ['van ', 'von ', 'di ', 'de ', 'el ' 'le ', 'del ', 'du ', 'des ', 'le ', 'la ',
