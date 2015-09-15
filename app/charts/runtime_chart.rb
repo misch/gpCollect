@@ -11,6 +11,18 @@ class RuntimeChart < LazyHighCharts::HighChart
     array.map { |value| generate_json_from_value(value) }.join(",")
   end
 
+  def make_runs_data(runner, &block)
+    @all_run_days.map do |rd|
+      run = runner.runs.find { |r| r.run_day == rd }
+      duration = if run
+                   yield(run)
+                 else
+                   nil
+                 end
+      [LazyHighCharts::OptionsKeyFilter.date_to_js_code(rd.date), duration]
+    end
+  end
+
   private
 
   def set_options
@@ -41,6 +53,7 @@ class RuntimeChart < LazyHighCharts::HighChart
                shared: true)
     self.tooltip(
         useHTML: true,
+        #shared: true,
         formatter: "function() {
           return '<b>' + this.series.name +'</b><br/>' +
               Highcharts.dateFormat('%e. %b. %Y', new Date(this.x)) + '<br/>' +

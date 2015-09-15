@@ -13,7 +13,7 @@ class RunnersController < ApplicationController
   # GET /runners/1
   # GET /runners/1.json
   def show
-    @chart = CompareRunnersChart.new([@runner])
+    @chart = ShowRunnerChart.new(@runner)
   end
 
   def show_remembered
