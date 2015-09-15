@@ -92,6 +92,6 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'faker'
 end
-gem :test do
+group :test do
   gem "codeclimate-test-reporter", require: nil
 end
