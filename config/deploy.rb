@@ -38,6 +38,9 @@ set :linked_dirs, fetch(:linked_dirs, []).push('public/assets', 'log')
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+set :rollbar_env, Proc.new { fetch :stage }
+set :rollbar_role, Proc.new { :app }
+
 ConditionalDeploy.configure(self) do |conditional|
   conditional.register :skip_migrations, :none_match => ['db/migrate'] do |c|
     c.skip_task 'deploy:migrate'

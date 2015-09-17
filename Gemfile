@@ -67,6 +67,8 @@ gem 'rack-mini-profiler'
 gem 'flamegraph'
 gem 'stackprof'
 
+gem 'rollbar'
+
 group :development do
   # For tracking progress when seeding
   gem 'ruby-progressbar'
