@@ -38,6 +38,7 @@ set :linked_dirs, fetch(:linked_dirs, []).push('public/assets', 'log')
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+set :rollbar_token, ENV['ROLLBAR_ACCESS_TOKEN']
 set :rollbar_env, Proc.new { fetch :stage }
 set :rollbar_role, Proc.new { :app }
 
